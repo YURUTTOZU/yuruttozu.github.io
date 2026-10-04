@@ -173,25 +173,36 @@ audio.home.volume=.21; audio.game.volume=.21; audio.jump.volume=.72; audio.over.
 let audioUnlocked=false;
 function stopAudio(a){a.pause();try{a.currentTime=0}catch(e){}}
 function playAudio(a,restart=false){if(!soundOn)return;if(restart)stopAudio(a);const p=a.play();if(p&&p.catch)p.catch(()=>{});}
-// アイテム取得音はゲーム中にcloneNode()するとiPhoneで再生開始が遅れることがあるため、
-// あらかじめ複数のAudioを読み込んで使い回す。連続取得でも音を重ねられる。
-const itemGetPool=Array.from({length:6},()=>{
- const s=new Audio('assets/item_get.wav');
- s.preload='auto';
- s.volume=.72;
- s.load();
- return s;
-});
-let itemGetPoolIndex=0;
+// アイテム取得音はWeb Audio APIで先読みし、取得した瞬間に鳴らす。
+// iPhone SafariでHTMLAudioElementのplay()開始が遅れる問題を避けるため。
+const ItemAudioContext=window.AudioContext||window.webkitAudioContext;
+let itemAudioCtx=null,itemGetBuffer=null;
+if(ItemAudioContext){
+ try{
+  itemAudioCtx=new ItemAudioContext();
+  fetch('assets/item_get.wav').then(r=>r.arrayBuffer()).then(b=>itemAudioCtx.decodeAudioData(b)).then(buf=>{itemGetBuffer=buf}).catch(()=>{});
+ }catch(e){}
+}
+function unlockItemAudio(){
+ if(itemAudioCtx&&itemAudioCtx.state==='suspended'){try{itemAudioCtx.resume().catch(()=>{})}catch(e){}}
+}
 function playItemGet(){
  if(!soundOn)return;
- const s=itemGetPool[itemGetPoolIndex];
- itemGetPoolIndex=(itemGetPoolIndex+1)%itemGetPool.length;
- try{s.pause();s.currentTime=0}catch(e){}
- const p=s.play();if(p&&p.catch)p.catch(()=>{});
+ if(itemAudioCtx&&itemGetBuffer){
+  unlockItemAudio();
+  try{
+   const src=itemAudioCtx.createBufferSource();
+   const gain=itemAudioCtx.createGain();
+   src.buffer=itemGetBuffer;gain.gain.value=.72;
+   src.connect(gain);gain.connect(itemAudioCtx.destination);src.start(0);
+   return;
+  }catch(e){}
+ }
+ // Web Audioの準備前だけ従来方式へフォールバック。
+ const s=audio.itemGet.cloneNode();s.volume=audio.itemGet.volume;s.play().catch(()=>{});
 }
 function startHomeMusic(){if(soundOn){stopAudio(audio.game);playAudio(audio.home)}}
-function unlockAudio(){if(audioUnlocked)return;audioUnlocked=true;startHomeMusic()}
+function unlockAudio(){unlockItemAudio();if(audioUnlocked)return;audioUnlocked=true;startHomeMusic()}
 document.querySelectorAll('.char').forEach(b=>b.onclick=()=>{unlockAudio();document.querySelectorAll('.char').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');selected=b.dataset.id;selectedName.textContent=b.dataset.name+' を選択中'});soundHot.onclick=()=>{soundOn=!soundOn;soundState.textContent='サウンド '+(soundOn?'ON':'OFF');audioUnlocked=true;if(soundOn){if(gameScreen.style.display==='block'&&running)playAudio(audio.game);else startHomeMusic()}else{Object.values(audio).forEach(stopAudio)}};rankHot.onclick=showRanking;rankClose.onclick=()=>ranking.classList.add('hide');
 const C=document.getElementById('game'),ctx=C.getContext('2d'),bgNames=['お菓子コーナー','飲み物コーナー','やさい・くだもの','お肉・お魚','冷凍食品・アイス'];const load=s=>new Promise(r=>{let i=new Image();i.onload=()=>r(i);i.src=s});let bg=[],obsImgs=[],heroes={};Promise.all([load('assets/loop_bg.png')]).then(x=>bg=x);const obstacleDefs=[
 {src:'assets/obstacle1.png',w:130,h:105},{src:'assets/obstacle2.png',w:100,h:145},{src:'assets/obstacle3.png',w:120,h:135},{src:'assets/obstacle4.png',w:145,h:150},
@@ -220,6 +231,7 @@ function isMobilePortrait(){return window.matchMedia('(orientation: portrait)').
 function showRotatePrompt(){waitingForLandscape=true;rotatePrompt.classList.remove('hide');rotatePrompt.setAttribute('aria-hidden','false')}
 function hideRotatePrompt(){rotatePrompt.classList.add('hide');rotatePrompt.setAttribute('aria-hidden','true')}
 function primeGameAudio(){
+ unlockItemAudio();
  // iPhone Safari対策：ゲームスタートの「タップ」そのものを使って
  // game_bgm を一度だけ再生可能な状態にしておく。
  if(!soundOn)return;
