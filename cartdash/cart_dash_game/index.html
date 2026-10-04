@@ -204,12 +204,26 @@ function isMobilePortrait(){return window.matchMedia('(orientation: portrait)').
 function showRotatePrompt(){waitingForLandscape=true;rotatePrompt.classList.remove('hide');rotatePrompt.setAttribute('aria-hidden','false')}
 function hideRotatePrompt(){rotatePrompt.classList.add('hide');rotatePrompt.setAttribute('aria-hidden','true')}
 function primeGameAudio(){
- // 横向き案内中はゲームBGMを絶対に再生しない。
- // iPhone Safariでは Audio.volume=0 が期待通り効かない場合があるため、
- // 無音再生による事前解除は行わない。
- stopAudio(audio.game);
+ // iPhone Safari対策：ゲームスタートの「タップ」そのものを使って
+ // game_bgm を一度だけ再生可能な状態にしておく。
+ if(!soundOn)return;
+ try{
+  audio.game.volume=.21;
+  const p=audio.game.play();
+  if(p&&p.then){
+   p.then(()=>{audio.game.pause();try{audio.game.currentTime=0}catch(e){}}).catch(()=>{});
+  }else{
+   audio.game.pause();try{audio.game.currentTime=0}catch(e){}
+  }
+ }catch(e){}
+}
+function ensureGameMusic(){
+ // READY/GO後の自動再生がSafariに止められた場合でも、
+ // 最初のジャンプ操作（ユーザーのタップ）で確実にBGMを開始する。
+ if(soundOn&&running&&audio.game.paused)playAudio(audio.game,false);
 }
 function begin(){
+ primeGameAudio();
  if(isMobilePortrait()){stopAudio(audio.game);startHomeMusic();showRotatePrompt();return}
  waitingForLandscape=false;hideRotatePrompt();
  // 横向きになったらホームBGMを完全停止。ゲームBGMはREADY/GO終了まで再生しない。
@@ -395,5 +409,5 @@ for(let o of obstacles){
   }
  }
  if(obstacleHit){draw();gameOver();return}
-}draw();requestAnimationFrame(loop)}home.addEventListener('pointerdown',unlockAudio,{once:true});startHot.onclick=begin;retry.onclick=begin;back.onclick=goHome;homeBtn.onclick=goHome;C.addEventListener('pointerdown',jump);window.addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='ArrowUp')&&gameScreen.style.display==='block'){e.preventDefault();jump()}});window.addEventListener('orientationchange',()=>setTimeout(()=>{if(waitingForLandscape&&!isMobilePortrait())begin()},180));window.addEventListener('resize',()=>{if(waitingForLandscape&&!isMobilePortrait())begin()});draw();
+}draw();requestAnimationFrame(loop)}home.addEventListener('pointerdown',unlockAudio,{once:true});startHot.onclick=begin;retry.onclick=begin;back.onclick=goHome;homeBtn.onclick=goHome;C.addEventListener('pointerdown',()=>{ensureGameMusic();jump()});window.addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='ArrowUp')&&gameScreen.style.display==='block'){e.preventDefault();jump()}});window.addEventListener('orientationchange',()=>setTimeout(()=>{if(waitingForLandscape&&!isMobilePortrait())begin()},180));window.addEventListener('resize',()=>{if(waitingForLandscape&&!isMobilePortrait())begin()});draw();
 </script></body></html>
