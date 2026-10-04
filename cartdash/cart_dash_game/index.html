@@ -140,6 +140,32 @@
 #rotatePrompt{position:fixed;inset:0;z-index:9999;background:#111;display:flex;align-items:center;justify-content:center;padding:0}
 #rotatePrompt.hide{display:none}
 #rotatePrompt img{display:block;width:100%;height:100%;object-fit:contain}
+
+/* iPhone Safari: 実際に見えている表示領域に16:9画面を収める */
+:root{--vvw:100vw;--vvh:100dvh}
+html,body{width:100%;height:100%;min-height:100dvh;overflow:hidden}
+.app{position:fixed;left:0;top:0;width:var(--vvw);height:var(--vvh);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.screen{width:min(var(--vvw),calc(var(--vvh) * 1.7777778));height:min(var(--vvh),calc(var(--vvw) * .5625));aspect-ratio:auto;flex:0 0 auto}
+
+/* 結果画面は横向きの実表示高さに必ず収める */
+@media (orientation:landscape){
+  #over{padding:1.2% 0}
+  #over .card{width:min(76%,820px);min-width:0;max-height:96%;padding:7px 24px 9px;border-radius:18px;overflow:hidden}
+  #over .card h2{margin:0 0 1px;font-size:clamp(17px,2vw,26px);line-height:1.05}
+  #resultCharacterArea{gap:12px;margin:0 auto 2px;max-width:650px;height:clamp(92px,18vh,132px)}
+  #resultCharacterImg{width:clamp(88px,16vh,128px);height:clamp(88px,16vh,128px)}
+  #resultSpeech{padding:7px 13px;border-width:3px;border-radius:18px;font-size:clamp(13px,1.55vw,19px);line-height:1.2;max-width:370px;box-shadow:0 3px 0 #f7c7db}
+  #resultSpeech:before{left:-15px;border-width:9px 15px 9px 0}
+  #over .card p{margin:.12em 0!important;font-size:clamp(14px,1.55vw,20px)!important;line-height:1.08}
+  #final{font-size:clamp(27px,3vw,38px)!important}
+  #finalPoints{font-size:clamp(28px,3.2vw,40px)!important}
+  #over .card button{padding:.42em 1.15em;font-size:clamp(14px,1.6vw,19px);margin:.18em .22em}
+}
+
+/* 縦向きでランキングを見る場合も10行が収まるようにする */
+@media (orientation:portrait){
+  #ranking .rankRow{font-size:clamp(8px,2vw,14px);border-bottom-width:1px}
+}
 </style></head><body><div id="rotatePrompt" class="hide" aria-hidden="true"><img src="assets/rotate_phone.png" alt="スマホを横向きにしてね！"></div><div class="app"><section class="screen" id="home"><img id="homeImg" src="assets/home.jpg">
 <button class="hot char" data-id="panna" data-name="パンナ" style="left:.4%;top:38%;width:12%;height:25%"></button><button class="hot char" data-id="ajihei" data-name="あじへい" style="left:10%;top:40%;width:13%;height:28%"></button><button class="hot char" data-id="uinta" data-name="ういんた" style="left:21%;top:39%;width:13%;height:29%"></button><button class="hot char" data-id="senbei" data-name="せんべい" style="left:31%;top:38%;width:13%;height:27%"></button><button class="hot char selected" data-id="kyabecchi" data-name="きゃべっち" style="left:42%;top:36%;width:16%;height:34%"></button><button class="hot char" data-id="aimy" data-name="アイミー" style="left:57%;top:40%;width:15%;height:31%"></button><button class="hot char" data-id="koromi" data-name="コロミさん" style="left:71%;top:38%;width:13%;height:28%"></button><button class="hot char" data-id="tamachan" data-name="たまちゃん" style="left:84%;top:40%;width:15%;height:28%"></button>
 <div id="selectedName">きゃべっち を選択中</div><button class="hot" id="startHot"></button><button class="hot" id="rankHot"></button><button class="hot" id="soundHot"></button><div id="soundState">サウンド ON</div><div class="overlay hide" id="ranking">
@@ -155,6 +181,22 @@
 <div id="readyLayer" class="hide"><img id="readyImage" src="assets/ready.png" alt=""></div><button id="back">ホームへ</button><div class="overlay hide" id="over"><div class="card"><h2>ゲームオーバー！</h2><div id="resultCharacterArea"><img id="resultCharacterImg" alt=""><div id="resultSpeech"></div></div><p><b id="final" style="font-size:36px">0</b> m</p>
 <p><span id="finalItemName">アイテム</span> <b id="finalItems">0</b>個</p>
 <p style="font-size:24px;font-weight:900"><span id="finalCalc">0m × 0個</span><br><b id="finalPoints" style="font-size:38px;color:#ef4c30">0</b> pt</p><button id="retry">もう一度</button><button id="homeBtn">ホームへ</button></div></div></section></div><script>
+
+// iPhone Safari のアドレスバー等を除いた「実際に見える領域」を使う
+function updateVisibleViewport(){
+  const vv=window.visualViewport;
+  const w=vv?vv.width:window.innerWidth;
+  const h=vv?vv.height:window.innerHeight;
+  document.documentElement.style.setProperty('--vvw',w+'px');
+  document.documentElement.style.setProperty('--vvh',h+'px');
+}
+updateVisibleViewport();
+window.addEventListener('resize',updateVisibleViewport,{passive:true});
+window.addEventListener('orientationchange',()=>setTimeout(updateVisibleViewport,80),{passive:true});
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',updateVisibleViewport,{passive:true});
+  window.visualViewport.addEventListener('scroll',updateVisibleViewport,{passive:true});
+}
 const names={kyabecchi:'きゃべっち',ajihei:'あじへい',uinta:'ういんた',koromi:'コロミさん',panna:'パンナ',tamachan:'たまちゃん',senbei:'せんべい',aimy:'アイミー'};
 function getRanking(){try{const v=JSON.parse(localStorage.getItem('cartDashRanking')||'[]');return Array.isArray(v)?v:[]}catch(e){return []}}
 function saveScore(charId,meters,itemCount){const list=getRanking(),points=meters*itemCount,token=Date.now()+'_'+Math.random();list.push({charId:charId,name:names[charId]||charId,distance:meters,items:itemCount,points,_run:token});list.sort((a,b)=>(b.points||0)-(a.points||0));const rank=list.findIndex(x=>x._run===token)+1;localStorage.setItem('cartDashRanking',JSON.stringify(list.slice(0,10).map(({_run,...x})=>x)));return rank>0&&rank<=10?rank:0}
