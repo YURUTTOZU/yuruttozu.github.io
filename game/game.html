@@ -1586,3 +1586,31 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
 }
 </style>
+
+<style id="github-pages-iphone-fullscreen-20261004">
+/* GitHub Pages版：XREA広告用の高さ差し引きを無効化し、
+   iPhone縦向きではSafariの安定した表示領域いっぱいに画面を使う。
+   svhを使うことで、アドレスバーの出入りによる細かな伸縮も抑える。 */
+@media (orientation:portrait){
+  html,body{
+    width:100%!important;
+    height:100%!important;
+    min-height:100svh!important;
+    margin:0!important;
+    overflow:hidden!important;
+    background:#000!important;
+  }
+  .screen,
+  #home,#game,#ranking{
+    width:100vw!important;
+    height:100svh!important;
+    min-height:100svh!important;
+    max-width:none!important;
+    max-height:none!important;
+    margin:0!important;
+    background-size:100% 100%!important;
+    background-position:center!important;
+    background-repeat:no-repeat!important;
+  }
+}
+</style>
