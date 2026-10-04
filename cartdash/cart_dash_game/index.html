@@ -162,10 +162,9 @@ html,body{width:100%;height:100%;min-height:100dvh;overflow:hidden}
   #over .card button{padding:.42em 1.15em;font-size:clamp(14px,1.6vw,19px);margin:.18em .22em}
 }
 
-/* 縦向きでランキングを見る場合も10行が収まるようにする */
-@media (orientation:portrait){
-  #ranking .rankRow{font-size:clamp(8px,2vw,14px);border-bottom-width:1px}
-}
+/* スマホ縦向きではゲーム本体を見せず、回転案内だけにする */
+body.portraitLocked .app{visibility:hidden;pointer-events:none}
+body.portraitLocked #rotatePrompt{visibility:visible}
 </style></head><body><div id="rotatePrompt" class="hide" aria-hidden="true"><img src="assets/rotate_phone.png" alt="スマホを横向きにしてね！"></div><div class="app"><section class="screen" id="home"><img id="homeImg" src="assets/home.jpg">
 <button class="hot char" data-id="panna" data-name="パンナ" style="left:.4%;top:38%;width:12%;height:25%"></button><button class="hot char" data-id="ajihei" data-name="あじへい" style="left:10%;top:40%;width:13%;height:28%"></button><button class="hot char" data-id="uinta" data-name="ういんた" style="left:21%;top:39%;width:13%;height:29%"></button><button class="hot char" data-id="senbei" data-name="せんべい" style="left:31%;top:38%;width:13%;height:27%"></button><button class="hot char selected" data-id="kyabecchi" data-name="きゃべっち" style="left:42%;top:36%;width:16%;height:34%"></button><button class="hot char" data-id="aimy" data-name="アイミー" style="left:57%;top:40%;width:15%;height:31%"></button><button class="hot char" data-id="koromi" data-name="コロミさん" style="left:71%;top:38%;width:13%;height:28%"></button><button class="hot char" data-id="tamachan" data-name="たまちゃん" style="left:84%;top:40%;width:15%;height:28%"></button>
 <div id="selectedName">きゃべっち を選択中</div><button class="hot" id="startHot"></button><button class="hot" id="rankHot"></button><button class="hot" id="soundHot"></button><div id="soundState">サウンド ON</div><div class="overlay hide" id="ranking">
@@ -182,20 +181,31 @@ html,body{width:100%;height:100%;min-height:100dvh;overflow:hidden}
 <p><span id="finalItemName">アイテム</span> <b id="finalItems">0</b>個</p>
 <p style="font-size:24px;font-weight:900"><span id="finalCalc">0m × 0個</span><br><b id="finalPoints" style="font-size:38px;color:#ef4c30">0</b> pt</p><button id="retry">もう一度</button><button id="homeBtn">ホームへ</button></div></div></section></div><script>
 
-// iPhone Safari のアドレスバー等を除いた「実際に見える領域」を使う
+// iPhone Safari の横向き表示だけをゲーム画面に使う。
+// 縦向きではゲーム本体を動かさず「スマホを横向きにしてね！」を全面表示する。
 function updateVisibleViewport(){
+  if(window.matchMedia('(orientation: portrait)').matches)return;
   const vv=window.visualViewport;
   const w=vv?vv.width:window.innerWidth;
   const h=vv?vv.height:window.innerHeight;
   document.documentElement.style.setProperty('--vvw',w+'px');
   document.documentElement.style.setProperty('--vvh',h+'px');
 }
+function syncOrientationGate(){
+  if(isMobilePortrait()){
+    showRotatePrompt();
+    document.body.classList.add('portraitLocked');
+    return;
+  }
+  document.body.classList.remove('portraitLocked');
+  hideRotatePrompt();
+  updateVisibleViewport();
+}
 updateVisibleViewport();
-window.addEventListener('resize',updateVisibleViewport,{passive:true});
-window.addEventListener('orientationchange',()=>setTimeout(updateVisibleViewport,80),{passive:true});
+window.addEventListener('orientationchange',()=>setTimeout(syncOrientationGate,120),{passive:true});
+window.addEventListener('resize',()=>{if(!isMobilePortrait())updateVisibleViewport()},{passive:true});
 if(window.visualViewport){
-  window.visualViewport.addEventListener('resize',updateVisibleViewport,{passive:true});
-  window.visualViewport.addEventListener('scroll',updateVisibleViewport,{passive:true});
+  window.visualViewport.addEventListener('resize',()=>{if(!isMobilePortrait())updateVisibleViewport()},{passive:true});
 }
 const names={kyabecchi:'きゃべっち',ajihei:'あじへい',uinta:'ういんた',koromi:'コロミさん',panna:'パンナ',tamachan:'たまちゃん',senbei:'せんべい',aimy:'アイミー'};
 function getRanking(){try{const v=JSON.parse(localStorage.getItem('cartDashRanking')||'[]');return Array.isArray(v)?v:[]}catch(e){return []}}
@@ -294,7 +304,7 @@ function ensureGameMusic(){
 }
 function begin(){
  primeGameAudio();
- if(isMobilePortrait()){stopAudio(audio.game);startHomeMusic();showRotatePrompt();return}
+ if(isMobilePortrait()){stopAudio(audio.game);syncOrientationGate();return}
  waitingForLandscape=false;hideRotatePrompt();
  // 横向きになったらホームBGMを完全停止。ゲームBGMはREADY/GO終了まで再生しない。
  stopAudio(audio.home);
@@ -479,5 +489,5 @@ for(let o of obstacles){
   }
  }
  if(obstacleHit){draw();gameOver();return}
-}draw();requestAnimationFrame(loop)}home.addEventListener('pointerdown',unlockAudio,{once:true});startHot.onclick=begin;retry.onclick=begin;back.onclick=goHome;homeBtn.onclick=goHome;C.addEventListener('pointerdown',()=>{ensureGameMusic();jump()});window.addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='ArrowUp')&&gameScreen.style.display==='block'){e.preventDefault();jump()}});window.addEventListener('orientationchange',()=>setTimeout(()=>{if(waitingForLandscape&&!isMobilePortrait())begin()},180));window.addEventListener('resize',()=>{if(waitingForLandscape&&!isMobilePortrait())begin()});draw();
+}draw();requestAnimationFrame(loop)}home.addEventListener('pointerdown',unlockAudio,{once:true});startHot.onclick=begin;retry.onclick=begin;back.onclick=goHome;homeBtn.onclick=goHome;C.addEventListener('pointerdown',()=>{ensureGameMusic();jump()});window.addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='ArrowUp')&&gameScreen.style.display==='block'){e.preventDefault();jump()}});syncOrientationGate();draw();
 </script></body></html>
