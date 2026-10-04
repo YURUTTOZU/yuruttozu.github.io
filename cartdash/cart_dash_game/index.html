@@ -1,0 +1,399 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover"><title>ゆるっとーずのカートダッシュ！</title><style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111;font-family:"Yu Gothic",Meiryo,sans-serif}.app{width:100vw;height:100vh;display:flex;align-items:center;justify-content:center}.screen{position:relative;width:min(100vw,calc(100vh*16/9));aspect-ratio:16/9;overflow:hidden;background:#000}#homeImg,canvas{width:100%;height:100%;display:block}#homeImg{object-fit:cover}.hot{position:absolute;border:0;background:transparent;padding:0;cursor:pointer;z-index:5;border-radius:35%}.char.selected{outline:clamp(3px,.45vw,7px) solid #fff600;box-shadow:0 0 0 clamp(2px,.25vw,4px) #ff7b00,0 0 20px #fff600}#selectedName{position:absolute;left:50%;bottom:18.5%;transform:translateX(-50%);z-index:7;background:#fff;border:4px solid #ff7b00;border-radius:999px;padding:.25em .9em;color:#4b2600;font-weight:900;font-size:clamp(12px,1.7vw,26px);pointer-events:none;white-space:nowrap}#startHot{left:28%;top:72%;width:42%;height:16%}#rankHot{left:1%;top:73%;width:25%;height:15%}#soundHot{left:72%;top:73%;width:27%;height:15%}#soundState{position:absolute;right:2%;bottom:1.5%;z-index:7;color:#fff;background:#0009;border-radius:999px;padding:.2em .6em;font-weight:900;font-size:clamp(10px,1.2vw,18px)}#gameScreen{display:none}
+#readyLayer{position:absolute;inset:0;z-index:18;display:flex;align-items:center;justify-content:center;pointer-events:none}
+#readyText{font-size:clamp(60px,12vw,150px);font-weight:1000;color:#fff;text-shadow:0 7px 0 #ef4c30,0 12px 25px #000;letter-spacing:.04em}
+#readyText.go{color:#fff33d;text-shadow:0 7px 0 #ff6a00,0 12px 25px #000}.hud{position:absolute;z-index:8;top:2%;left:2%;right:2%;display:flex;justify-content:space-between;color:#fff;font-weight:900;font-size:clamp(16px,2vw,30px);text-shadow:0 2px 5px #000}canvas{touch-action:manipulation}#back{position:absolute;z-index:10;left:1.5%;bottom:2%;border:0;border-radius:999px;padding:.55em 1em;font-weight:900;font-size:clamp(13px,1.5vw,22px)}.overlay{position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:#0008}.hide{display:none!important}.card{background:#fff;color:#222;border-radius:24px;padding:22px 34px;text-align:center;min-width:42%;box-shadow:0 10px 35px #0008}.card h2{margin:.2em 0;color:#ef4c30}.card button{border:0;border-radius:999px;padding:.65em 1.4em;font-size:20px;font-weight:900;background:#ffd33d;margin:.3em}
+#ranking{background:#000}
+#ranking .rankingBg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#ranking .rankCover{position:absolute;left:21.2%;top:16.2%;width:57.8%;height:67.3%;background:#fff8e8;border-radius:2.2%;z-index:21}
+#ranking .rankRows{position:absolute;left:22.2%;top:16.9%;width:55.8%;height:65.5%;display:grid;grid-template-rows:repeat(10,1fr);z-index:22}
+#ranking .rankRow{display:grid;grid-template-columns:15% 30% 55%;align-items:center;border-bottom:2px solid #f1d7a5;color:#4b1d0d;font-weight:900;font-size:clamp(11px,1.55vw,23px);padding:0 2.5%}
+#ranking .rankRow:last-child{border-bottom:0}
+#ranking .rankRow .pos{text-align:center}
+#ranking .rankRow .name{text-align:left;padding-left:8%}
+#ranking .rankRow .dist{text-align:right;white-space:nowrap}
+#ranking .rankRow.top1{background:#fff1a8}
+#ranking .rankRow.top2{background:#eef2f5}
+#ranking .rankRow.top3{background:#ffe0c1}
+#ranking .rankHomeHot{position:absolute;z-index:25;left:40%;bottom:2.2%;width:21%;height:10.5%;border:0;background:transparent;border-radius:999px;cursor:pointer}
+#soundState{display:none!important}#selectedName{display:none!important}
+#rankHot{left:1.5%;top:80.0%;width:25.5%;height:16.8%;}
+#startHot{left:27.2%;top:78.5%;width:43.8%;height:18.8%;}
+#soundHot{left:71.4%;top:80.0%;width:27.2%;height:16.8%;}
+
+/* READY / GO! かわいい演出 */
+#readyLayer{
+  background:transparent!important;
+}
+#readyText{
+  font-family:"Arial Rounded MT Bold","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif!important;
+  font-size:clamp(64px,13vw,160px)!important;
+  font-weight:1000!important;
+  line-height:1!important;
+  letter-spacing:.04em!important;
+  color:#58d9ff!important;
+  -webkit-text-stroke:clamp(3px,.5vw,8px) #fff!important;
+  text-shadow:
+    0 .055em 0 #178dcc,
+    0 .10em 0 #126ca8,
+    0 .15em .18em rgba(0,0,0,.28)!important;
+  transform-origin:center;
+  animation:readyPop .48s cubic-bezier(.2,1.55,.45,1) both;
+}
+#readyText.go{
+  color:#ffd83d!important;
+  -webkit-text-stroke:clamp(3px,.5vw,8px) #fff!important;
+  text-shadow:
+    0 .055em 0 #ff8a00,
+    0 .10em 0 #ef5700,
+    0 .15em .18em rgba(0,0,0,.28)!important;
+  animation:goPop .52s cubic-bezier(.2,1.55,.45,1) both;
+}
+@keyframes readyPop{
+  0%{transform:scale(.45) rotate(-5deg);opacity:0}
+  65%{transform:scale(1.13) rotate(2deg);opacity:1}
+  100%{transform:scale(1) rotate(0)}
+}
+@keyframes goPop{
+  0%{transform:scale(.4) rotate(5deg);opacity:0}
+  62%{transform:scale(1.18) rotate(-2deg);opacity:1}
+  100%{transform:scale(1) rotate(0)}
+}
+
+
+/* READY / GO! 専用イラスト表示 */
+#readyLayer{background:transparent!important;}
+#readyImage{
+  display:block;
+  width:min(62%,760px);
+  max-height:52%;
+  object-fit:contain;
+  filter:drop-shadow(0 10px 12px rgba(0,0,0,.22));
+  transform-origin:center;
+  animation:readyImagePop .38s cubic-bezier(.2,1.5,.45,1) both;
+}
+#readyImage.goImage{
+  width:min(48%,590px);
+  animation:goImagePop .40s cubic-bezier(.2,1.55,.45,1) both;
+}
+@keyframes readyImagePop{
+  0%{transform:scale(.45);opacity:0}
+  70%{transform:scale(1.10);opacity:1}
+  100%{transform:scale(1);opacity:1}
+}
+@keyframes goImagePop{
+  0%{transform:scale(.42);opacity:0}
+  68%{transform:scale(1.14);opacity:1}
+  100%{transform:scale(1);opacity:1}
+}
+
+
+/* 今回の修正：ゲーム中の左上距離表示・右上コーナー名を非表示 */
+#distance,#distanceText,#score,#stageName,#stage,#cornerName,
+.distance,.distanceText,.score,.stageName,.stage,.cornerName{
+  display:none!important;
+}
+
+#stage{display:none!important;}
+
+.hud{display:none!important;}
+
+/* 新しい距離表示 */
+#distanceHud{
+  position:absolute;z-index:22;left:1.2%;top:1.4%;
+  height:9.2%;min-width:15.5%;max-width:29%;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+#distanceHud img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:fill;
+}
+#distanceHud .distanceValue{
+  position:relative;z-index:1;
+  display:flex;align-items:baseline;justify-content:center;
+  gap:.28em;padding:0 1.35em;
+  white-space:nowrap;
+  font-family:"Arial Rounded MT Bold","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;
+  font-weight:1000;
+  text-shadow:0 2px 0 #3c1907,0 0 3px #3c1907;
+}
+#distanceHud .distanceLabel{
+  font-size:clamp(13px,1.45vw,25px);color:#fff;
+}
+#distanceLive{
+  font-size:clamp(24px,3.25vw,54px);color:#ffe43b;
+  -webkit-text-stroke:1.5px #fff;
+}
+#distanceHud .distanceUnit{
+  font-size:clamp(15px,1.65vw,28px);color:#fff;
+}
+
+
+#itemHud{position:absolute;z-index:15;right:2.2%;top:2.5%;width:26%;max-width:335px;min-width:210px;aspect-ratio:3/1;display:flex;align-items:center;justify-content:center;gap:7%;font-weight:1000;color:#fff;font-size:clamp(22px,3vw,42px);text-shadow:0 4px 0 #5b2a0c,0 0 4px #5b2a0c}
+#itemHud .itemBoard{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;z-index:-1}
+#itemHud #itemHudImg{width:29%;height:70%;object-fit:contain;filter:drop-shadow(0 3px 2px #5b2a0c)}
+#itemHud .times{font-size:.8em}
+#itemCountLive{min-width:1.3em;text-align:center}
+#resultCharacterArea{display:flex;align-items:center;justify-content:center;gap:18px;margin:2px auto 8px;max-width:700px}#resultCharacterImg{width:clamp(105px,18vw,170px);height:clamp(105px,18vw,170px);object-fit:contain}#resultSpeech{position:relative;background:#fff;border:4px solid #f29ac2;border-radius:24px;padding:12px 18px;font-weight:1000;color:#4b1d0d;font-size:clamp(16px,2vw,24px);line-height:1.35;max-width:390px;box-shadow:0 4px 0 #f7c7db}#resultSpeech:before{content:"";position:absolute;left:-18px;top:46%;border-width:11px 18px 11px 0;border-style:solid;border-color:transparent #f29ac2 transparent transparent}@media(max-width:600px){#resultCharacterImg{width:110px;height:110px}#resultSpeech{padding:9px 11px;font-size:15px}}
+
+
+#rotatePrompt{position:fixed;inset:0;z-index:9999;background:#111;display:flex;align-items:center;justify-content:center;padding:0}
+#rotatePrompt.hide{display:none}
+#rotatePrompt img{display:block;width:100%;height:100%;object-fit:contain}
+</style></head><body><div id="rotatePrompt" class="hide" aria-hidden="true"><img src="assets/rotate_phone.png" alt="スマホを横向きにしてね！"></div><div class="app"><section class="screen" id="home"><img id="homeImg" src="assets/home.jpg">
+<button class="hot char" data-id="panna" data-name="パンナ" style="left:.4%;top:38%;width:12%;height:25%"></button><button class="hot char" data-id="ajihei" data-name="あじへい" style="left:10%;top:40%;width:13%;height:28%"></button><button class="hot char" data-id="uinta" data-name="ういんた" style="left:21%;top:39%;width:13%;height:29%"></button><button class="hot char" data-id="senbei" data-name="せんべい" style="left:31%;top:38%;width:13%;height:27%"></button><button class="hot char selected" data-id="kyabecchi" data-name="きゃべっち" style="left:42%;top:36%;width:16%;height:34%"></button><button class="hot char" data-id="aimy" data-name="アイミー" style="left:57%;top:40%;width:15%;height:31%"></button><button class="hot char" data-id="koromi" data-name="コロミさん" style="left:71%;top:38%;width:13%;height:28%"></button><button class="hot char" data-id="tamachan" data-name="たまちゃん" style="left:84%;top:40%;width:15%;height:28%"></button>
+<div id="selectedName">きゃべっち を選択中</div><button class="hot" id="startHot"></button><button class="hot" id="rankHot"></button><button class="hot" id="soundHot"></button><div id="soundState">サウンド ON</div><div class="overlay hide" id="ranking">
+<img class="rankingBg" src="assets/ranking.png" alt="ランキング TOP10">
+<div class="rankCover"></div>
+<div class="rankRows" id="rankRows"></div>
+<button class="rankHomeHot" id="rankClose" aria-label="ホームへ"></button>
+</div></section>
+<section class="screen" id="gameScreen"><div class="hud"><div>距離 <span id="score">0</span>m</div><div id="stage">お菓子コーナー</div></div>
+<div id="distanceHud"><img src="assets/distance_board.png" alt=""><div class="distanceValue"><span class="distanceLabel">距離</span><span id="distanceLive">0</span><span class="distanceUnit">m</span></div></div>
+<div id="itemHud"><img class="itemBoard" src="assets/item_board.png" alt=""><img id="itemHudImg" alt=""><span class="times">×</span><span id="itemCountLive">0</span></div>
+<canvas id="game" width="1280" height="720"></canvas>
+<div id="readyLayer" class="hide"><img id="readyImage" src="assets/ready.png" alt=""></div><button id="back">ホームへ</button><div class="overlay hide" id="over"><div class="card"><h2>ゲームオーバー！</h2><div id="resultCharacterArea"><img id="resultCharacterImg" alt=""><div id="resultSpeech"></div></div><p><b id="final" style="font-size:36px">0</b> m</p>
+<p><span id="finalItemName">アイテム</span> <b id="finalItems">0</b>個</p>
+<p style="font-size:24px;font-weight:900"><span id="finalCalc">0m × 0個</span><br><b id="finalPoints" style="font-size:38px;color:#ef4c30">0</b> pt</p><button id="retry">もう一度</button><button id="homeBtn">ホームへ</button></div></div></section></div><script>
+const names={kyabecchi:'きゃべっち',ajihei:'あじへい',uinta:'ういんた',koromi:'コロミさん',panna:'パンナ',tamachan:'たまちゃん',senbei:'せんべい',aimy:'アイミー'};
+function getRanking(){try{const v=JSON.parse(localStorage.getItem('cartDashRanking')||'[]');return Array.isArray(v)?v:[]}catch(e){return []}}
+function saveScore(charId,meters,itemCount){const list=getRanking(),points=meters*itemCount,token=Date.now()+'_'+Math.random();list.push({charId:charId,name:names[charId]||charId,distance:meters,items:itemCount,points,_run:token});list.sort((a,b)=>(b.points||0)-(a.points||0));const rank=list.findIndex(x=>x._run===token)+1;localStorage.setItem('cartDashRanking',JSON.stringify(list.slice(0,10).map(({_run,...x})=>x)));return rank>0&&rank<=10?rank:0}
+function showRanking(){const list=getRanking().map(r=>({...r,items:r.items||0,points:r.points||0})).sort((a,b)=>b.points-a.points);rankRows.innerHTML='';for(let i=0;i<10;i++){const rec=list[i];const row=document.createElement('div');row.className='rankRow'+(i<3?' top'+(i+1):'');const pos=document.createElement('div');pos.className='pos';pos.textContent=(i+1)+'位';const name=document.createElement('div');name.className='name';name.textContent=rec?rec.name:'---';const info=document.createElement('div');info.className='dist';info.textContent=rec?(rec.distance.toLocaleString('ja-JP')+'m × '+rec.items+'個 = '+rec.points.toLocaleString('ja-JP')+'pt'):'---';row.append(pos,name,info);rankRows.appendChild(row)}ranking.classList.remove('hide')}
+let selected='kyabecchi',soundOn=true;
+const audio={
+ home:new Audio('assets/home_bgm.wav'),
+ game:new Audio('assets/game_bgm.wav'),
+ jump:new Audio('assets/jump.wav'),
+ over:new Audio('assets/gameover.wav'),
+ ready:new Audio('assets/ready_go.wav'),
+ itemGet:new Audio('assets/item_get.wav')
+};
+audio.home.loop=true; audio.game.loop=true;
+audio.home.volume=.21; audio.game.volume=.21; audio.jump.volume=.72; audio.over.volume=.75; audio.ready.volume=.9; audio.itemGet.volume=.72;
+let audioUnlocked=false;
+function stopAudio(a){a.pause();try{a.currentTime=0}catch(e){}}
+function playAudio(a,restart=false){if(!soundOn)return;if(restart)stopAudio(a);const p=a.play();if(p&&p.catch)p.catch(()=>{});}
+function playItemGet(){if(!soundOn)return;const s=audio.itemGet.cloneNode();s.volume=audio.itemGet.volume;s.play().catch(()=>{})}
+function startHomeMusic(){if(soundOn){stopAudio(audio.game);playAudio(audio.home)}}
+function unlockAudio(){if(audioUnlocked)return;audioUnlocked=true;startHomeMusic()}
+document.querySelectorAll('.char').forEach(b=>b.onclick=()=>{unlockAudio();document.querySelectorAll('.char').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');selected=b.dataset.id;selectedName.textContent=b.dataset.name+' を選択中'});soundHot.onclick=()=>{soundOn=!soundOn;soundState.textContent='サウンド '+(soundOn?'ON':'OFF');audioUnlocked=true;if(soundOn){if(gameScreen.style.display==='block'&&running)playAudio(audio.game);else startHomeMusic()}else{Object.values(audio).forEach(stopAudio)}};rankHot.onclick=showRanking;rankClose.onclick=()=>ranking.classList.add('hide');
+const C=document.getElementById('game'),ctx=C.getContext('2d'),bgNames=['お菓子コーナー','飲み物コーナー','やさい・くだもの','お肉・お魚','冷凍食品・アイス'];const load=s=>new Promise(r=>{let i=new Image();i.onload=()=>r(i);i.src=s});let bg=[],obsImgs=[],heroes={};Promise.all([load('assets/loop_bg.png')]).then(x=>bg=x);const obstacleDefs=[
+{src:'assets/obstacle1.png',w:130,h:105},{src:'assets/obstacle2.png',w:100,h:145},{src:'assets/obstacle3.png',w:120,h:135},{src:'assets/obstacle4.png',w:145,h:150},
+{src:'assets/can_1.png',w:90,h:65},{src:'assets/can_2.png',w:165,h:65},{src:'assets/can_4.png',w:165,h:125},
+{src:'assets/box_1.png',w:145,h:105},{src:'assets/box_2.png',w:245,h:105},{src:'assets/box_4.png',w:245,h:190},
+{src:'assets/rice_1.png',w:150,h:78},{src:'assets/rice_2.png',w:245,h:78},{src:'assets/rice_4.png',w:245,h:145},
+{src:'assets/milk_1.png',w:194,h:145},{src:'assets/milk_2.png',w:170,h:145},{src:'assets/milk_4.png',w:367,h:255}
+];
+const obstacleShapeMasks=[[[[17,22]],[[13,23]],[[12,23]],[[12,24]],[[11,24]],[[11,25]],[[11,25]],[[10,26]],[[8,26]],[[6,30]],[[4,36]],[[2,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,35]],[[0,35]],[[1,35]],[[1,35]],[[1,34]],[[2,34]],[[2,34]],[[2,34]],[[2,34]],[[2,34]],[[2,34]],[[2,33]],[[3,33]],[[3,33]],[[3,32]],[[3,31]],[[4,30]],[[9,29]],[[15,29]],[[20,28]]],[[[10,24]],[[9,28]],[[9,28]],[[9,28]],[[8,29]],[[8,29]],[[8,29]],[[7,30]],[[7,30]],[[7,30]],[[6,31]],[[6,31]],[[6,31]],[[5,31]],[[5,32]],[[5,32]],[[4,32]],[[4,33]],[[4,33]],[[3,33]],[[3,34]],[[3,34]],[[2,34]],[[2,34]],[[2,35]],[[1,35]],[[1,35]],[[1,36]],[[1,36]],[[0,27],[30,36]],[[0,8],[10,28],[30,36]],[[0,7],[15,28],[31,36]],[[0,7],[19,28]],[[4,6],[20,28]],[[19,28]],[[20,28]]],[[[5,14]],[[4,21]],[[3,29]],[[1,34]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[1,36]],[[3,36]],[[7,35]],[[12,34]],[[14,34]],[[20,33]],[[23,32]]],[[[13,23]],[[11,24]],[[11,24]],[[11,24]],[[11,24]],[[11,24]],[[11,24]],[[11,24]],[[11,24]],[[11,24]],[[7,29]],[[6,31]],[[5,31]],[[5,31]],[[6,31]],[[6,31]],[[6,31]],[[6,31]],[[6,31]],[[2,31]],[[1,35]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[2,11],[12,36]],[[14,22],[25,34]]],[[],[[13,23]],[[9,27]],[[7,29]],[[6,30]],[[5,32]],[[4,32]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[3,33]],[[4,33]],[[4,32]],[[5,32]],[[6,31]],[[7,29]],[[9,28]],[[12,25]]],[[[6,14],[23,31]],[[4,16],[21,33]],[[3,17],[20,34]],[[2,18],[19,35]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[2,18],[19,35]],[[3,17],[20,35]],[[4,16],[21,34]],[[5,15],[22,32]],[[8,12],[25,29]],[],[],[]],[[[8,15],[21,29]],[[6,17],[19,31]],[[5,31]],[[4,32]],[[4,32]],[[4,32]],[[4,32]],[[4,32]],[[4,32]],[[4,32]],[[4,32]],[[4,32]],[[4,32]],[[4,32]],[[4,32]],[[4,32]],[[3,34]],[[2,35]],[[2,35]],[[2,35]],[[2,35]],[[2,35]],[[2,35]],[[2,35]],[[2,35]],[[2,35]],[[2,35]],[[2,35]],[[2,35]],[[2,35]],[[2,35]],[[2,35]],[[2,35]],[[3,34]],[[4,16],[20,33]],[[6,14],[22,31]]],[[[19,27]],[[12,29]],[[6,30]],[[3,32]],[[3,33]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[3,34]],[[4,34]],[[5,34]],[[6,33]],[[7,30]],[[7,27]],[[8,24]],[[9,21]],[[10,18]],[[10,15]]],[[[28,33]],[[15,16],[22,34]],[[9,34]],[[4,35]],[[0,35]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[0,36]],[[1,36]],[[1,36]],[[1,36]],[[2,33]],[[2,17],[20,29]],[[3,14],[20,26]],[[3,10],[21,22]],[[4,6]]],[[[23,33]],[[11,34]],[[3,35]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[2,36]],[[2,36]],[[3,34]],[[4,28]],[[5,18]],[[5,11]]],[[],[],[],[],[[26,30]],[[17,31]],[[12,31]],[[8,31]],[[4,31]],[[1,32]],[[0,32]],[[0,33]],[[0,33]],[[0,34]],[[1,34]],[[1,34]],[[1,35]],[[1,35]],[[2,35]],[[2,35]],[[2,36]],[[2,36]],[[2,36]],[[2,36]],[[3,36]],[[3,36]],[[3,36]],[[3,36]],[[3,32],[33,34]],[[3,29]],[[3,26]],[[3,22]],[[3,18]],[[3,13]],[[3,7]],[]],[[[14,16],[31,33]],[[13,16],[30,33]],[[8,16],[25,33]],[[6,16],[23,33]],[[4,16],[21,34]],[[2,16],[19,34]],[[1,17],[18,34]],[[0,34]],[[0,34]],[[0,34]],[[0,35]],[[0,35]],[[0,35]],[[0,35]],[[0,35]],[[0,36]],[[0,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,15],[18,33]],[[1,13],[18,30]],[[1,11],[18,28]],[[1,9],[18,26]],[[1,7],[18,24]],[[1,3],[18,20]]],[[[14,16],[29,32]],[[12,16],[25,32]],[[8,17],[21,32]],[[5,17],[19,33]],[[3,33]],[[0,34]],[[0,34]],[[0,34]],[[0,35]],[[0,35]],[[0,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[0,36]],[[0,34]],[[0,35]],[[0,35]],[[0,35]],[[0,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[1,36]],[[2,36]],[[2,34]],[[2,31]],[[2,28]],[[2,17],[19,24]],[[2,14]],[[2,10]],[[2,5]]],[[[13,22]],[[13,22]],[[13,22]],[[13,23]],[[12,23]],[[12,24]],[[11,25]],[[11,25]],[[11,25]],[[11,25]],[[11,25]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[11,26]],[[12,26]],[[14,24]],[[15,19]]],[[[4,13],[19,27]],[[2,13],[17,27]],[[2,13],[17,27]],[[2,14],[16,28]],[[1,14],[16,29]],[[1,29]],[[0,30]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[0,31]],[[2,31]],[[3,13],[17,28]],[[4,9],[18,23]]],[[[12,23]],[[12,23]],[[11,23]],[[11,24]],[[10,24]],[[10,24]],[[10,24]],[[10,24]],[[10,24]],[[10,24]],[[10,24]],[[10,24]],[[10,24]],[[10,24]],[[10,24]],[[10,24]],[[10,24]],[[11,24]],[[10,24]],[[10,25]],[[10,25]],[[10,25]],[[10,25]],[[10,25]],[[10,25]],[[10,25]],[[10,25]],[[10,25]],[[10,25]],[[10,25]],[[10,25]],[[10,25]],[[10,25]],[[11,25]],[[12,25]],[[12,17],[18,22]]]];const obstacleMaskN=36;
+Promise.all(obstacleDefs.map(o=>load(o.src))).then(x=>obsImgs=x);let platformImg=null;load('assets/platform_mid.png').then(i=>platformImg=i);Object.keys(names).forEach(k=>load('assets/'+k+'.png').then(i=>heroes[k]=i));
+const itemInfo={
+ kyabecchi:{src:'assets/kyabecchi_item.png',name:'キャベツ'},ajihei:{src:'assets/ajihei_item.png',name:'魚'},
+ uinta:{src:'assets/uinta_item.png',name:'ウインナー'},koromi:{src:'assets/koromi_item.png',name:'じゃがいも'},
+ panna:{src:'assets/panna_item.png',name:'食パン'},tamachan:{src:'assets/tamachan_item.png',name:'たまご'},
+ senbei:{src:'assets/senbei_item.png',name:'せんべい'},aimy:{src:'assets/aimy_item.png',name:'アイス'}
+};
+const itemImgs={};Object.keys(itemInfo).forEach(k=>load(itemInfo[k].src).then(i=>itemImgs[k]=i));let running=false,starting=false,last=0,distance=0,y=0,vy=0,jumpCount=0,obstacles=[],spawnT=0,bgOffset=0,bgIndex=0,collectibles=[],itemCount=0,itemSpawnT=0,platforms=[],platformSpawnT=0,nextPlatformId=1;const VISUAL_SCALE=0.40,OBSTACLE_SCALE=0.60;
+const CHARACTER_ITEM_SCALE=1.5;
+const ground=650,heroW=Math.round(270*VISUAL_SCALE*CHARACTER_ITEM_SCALE),heroH=Math.round(180*VISUAL_SCALE*CHARACTER_ITEM_SCALE);
+// 距離難易度: 300mごとに上昇し、1200m以降はMAX(4)。速度は100mごとに上限なしで上昇。
+function difficultyLevel(){return Math.min(4,Math.floor(distance/300))}
+function currentSpeed(){return 360+Math.floor(distance/100)*25}
+function itemRowMax(){if(distance<=100)return 2;if(distance<=300)return 3;if(distance<=600)return 4;return 5}
+function reset(){distance=0;y=0;vy=0;jumpCount=0;obstacles=[];platforms=[];nextPlatformId=1;platformSpawnT=2.4;lastObstacle=-1;spawnT=2.7;bgOffset=0;bgIndex=0;collectibles=[{x:760,y:ground-Math.round(90*VISUAL_SCALE),w:Math.round(76*VISUAL_SCALE*CHARACTER_ITEM_SCALE),h:Math.round(76*VISUAL_SCALE*CHARACTER_ITEM_SCALE)}];itemCount=0;itemSpawnT=.55;score.textContent='0';distanceLive.textContent='0';itemCountLive.textContent='0';itemHudImg.src=itemInfo[selected].src;stage.textContent=bgNames[0];over.classList.add('hide')}let waitingForLandscape=false;
+function isMobilePortrait(){return window.matchMedia('(orientation: portrait)').matches && (navigator.maxTouchPoints>0 || 'ontouchstart' in window)}
+function showRotatePrompt(){waitingForLandscape=true;rotatePrompt.classList.remove('hide');rotatePrompt.setAttribute('aria-hidden','false')}
+function hideRotatePrompt(){rotatePrompt.classList.add('hide');rotatePrompt.setAttribute('aria-hidden','true')}
+function primeGameAudio(){
+ // 横向き案内中はゲームBGMを絶対に再生しない。
+ // iPhone Safariでは Audio.volume=0 が期待通り効かない場合があるため、
+ // 無音再生による事前解除は行わない。
+ stopAudio(audio.game);
+}
+function begin(){
+ if(isMobilePortrait()){stopAudio(audio.game);startHomeMusic();showRotatePrompt();return}
+ waitingForLandscape=false;hideRotatePrompt();
+ // 横向きになったらホームBGMを完全停止。ゲームBGMはREADY/GO終了まで再生しない。
+ stopAudio(audio.home);
+ stopAudio(audio.game);
+ audio.game.volume=.21;
+ if(!heroes[selected]||!itemImgs[selected]||bg.length<1||obsImgs.length<4){setTimeout(begin,80);return}
+ audioUnlocked=true; stopAudio(audio.home); stopAudio(audio.game); stopAudio(audio.over); stopAudio(audio.ready);
+ reset();running=false;starting=true;
+ gameScreen.style.display='block';
+ draw();
+ home.style.display='none';
+ readyLayer.classList.add('hide');
+ readyImage.src='assets/ready.png';readyImage.classList.remove('goImage');
+ playAudio(audio.ready,true);
+ // 録音音声: READY発声 約0.8秒 / GO発声 約2.6秒 に同期
+ setTimeout(()=>{if(!starting)return;readyImage.src='assets/ready.png';readyImage.classList.remove('goImage');void readyImage.offsetWidth;readyLayer.classList.remove('hide')},800);
+ setTimeout(()=>{if(!starting)return;readyImage.src='assets/go.png';readyImage.classList.add('goImage');void readyImage.offsetWidth},2600);
+ setTimeout(()=>{if(!starting)return;readyLayer.classList.add('hide');starting=false;running=true;playAudio(audio.game,true);last=performance.now();requestAnimationFrame(loop)},3050);
+}function goHome(){running=false;starting=false;readyLayer.classList.add('hide');stopAudio(audio.game);stopAudio(audio.ready);gameScreen.style.display='none';home.style.display='block';over.classList.add('hide');startHomeMusic()}function jump(){if(!running)return;if(jumpCount<2){vy=900;jumpCount++;playAudio(audio.jump,true)}}let lastObstacle=-1;
+const BOX_OBSTACLE_INDICES=[7,8,9];
+// 障害物を置く前に、すでにあるアイテムとの重なりを確認する。
+// 少し余白を持たせ、見た目でも接触しないようにする。
+function obstacleClearOfItems(x,y,w,h){
+ const marginX=42,marginY=22;
+ return !collectibles.some(it=>
+  x<it.x+it.w+marginX&&x+w>it.x-marginX&&y<it.y+it.h+marginY&&y+h>it.y-marginY
+ );
+}
+function spawn(){
+ // 平台の入口・出口付近には床の段ボールを出さない（着地直後の回避不能を防ぐ）
+ const sx=1320;
+ const unsafe=platforms.some(p=>sx>p.x-260&&sx<p.x+p.w+220);
+ if(unsafe){spawnT=.55+Math.random()*.45;return}
+ let idx;
+ do{idx=BOX_OBSTACLE_INDICES[Math.floor(Math.random()*BOX_OBSTACLE_INDICES.length)]}while(BOX_OBSTACLE_INDICES.length>1&&idx===lastObstacle);
+ lastObstacle=idx;
+ const d=obstacleDefs[idx];
+ const ow=Math.round(d.w*OBSTACLE_SCALE),oh=Math.round(d.h*OBSTACLE_SCALE),oy=ground-oh;
+ if(!obstacleClearOfItems(sx,oy,ow,oh)){spawnT=.55+Math.random()*.45;return}
+ obstacles.push({x:sx,idx,w:ow,h:oh});
+ const extra=(d.w>=220?0.28:0)+(d.h>=185?0.22:0);
+ const dl=difficultyLevel();
+ spawnT=(1.75+Math.random()*1.35+extra)*(1-dl*.085);
+}
+function spawnPlatform(){
+ if(!platformImg){platformSpawnT=1;return}
+ // 短・中・長を混ぜ、床区間の長さも毎回変えて単調さを減らす
+ const roll=Math.random();
+ const w=Math.round(roll<.30?360+Math.random()*150:roll<.75?520+Math.random()*190:720+Math.random()*230);
+ const id=nextPlatformId++,h=205;
+ const p={id,x:1320,w,h,top:ground-h};
+ platforms.push(p);
+ // 平台の最初と最後は安全地帯。段ボールは中央寄りだけに置く
+ const safeEdge=210;
+ const usable=Math.max(0,w-safeEdge*2);
+ const dl=difficultyLevel();
+ const doubleChance=.30+dl*.10; // 0m=30% → 1200m+=70%。2個までで障害物だらけにしない
+ const count=usable>330&&Math.random()<doubleChance?2:(usable>80?1:0);
+ for(let n=0;n<count;n++){
+  let idx=BOX_OBSTACLE_INDICES[Math.floor(Math.random()*BOX_OBSTACLE_INDICES.length)],d=obstacleDefs[idx];
+  let ow=Math.round(d.w*OBSTACLE_SCALE),oh=Math.round(d.h*OBSTACLE_SCALE);
+  let relX=count===1?Math.round(safeEdge+usable*.52):Math.round(safeEdge+usable*(.28+n*.44));
+  relX=Math.min(w-safeEdge-ow,Math.max(safeEdge,relX));
+  const ox=p.x+relX,oy=p.top-oh+8;
+  if(obstacleClearOfItems(ox,oy,ow,oh))obstacles.push({x:ox,idx,w:ow,h:oh,platformId:id,relX});
+ }
+ // 次の平台までの間隔を大きく揺らす：近い連続区間と広い床区間の両方を作る
+ const gapRoll=Math.random();
+ const gapBase=gapRoll<.28?3.1+Math.random()*1.0:gapRoll<.78?4.7+Math.random()*1.8:7.0+Math.random()*2.0;
+ platformSpawnT=gapBase*(1-dl*.045);
+}
+function spawnItem(){
+ const iw=Math.round(76*VISUAL_SCALE*CHARACTER_ITEM_SCALE),ih=Math.round(76*VISUAL_SCALE*CHARACTER_ITEM_SCALE),gap=iw+16;
+ const active=platforms.filter(p=>p.x<1510&&p.x+p.w>1280);
+ const r=Math.random();
+ let count=1,baseX=1320,baseY=ground-ih-8;
+ // ①取りやすい床の横列 ②ジャンプでまとめて取る高めの横列 ③平台上の横列
+ if(active.length&&r<.38){
+  const pl=active[active.length-1];
+  count=1+Math.floor(Math.random()*itemRowMax());
+  baseX=Math.max(1320,pl.x+90);
+  baseY=pl.top-ih-12;
+  const maxCount=Math.max(1,Math.floor((pl.x+pl.w-100-baseX)/gap)+1);
+  count=Math.min(count,maxCount);
+ }else if(r<.70){
+  count=1+Math.floor(Math.random()*itemRowMax());
+  baseY=ground-ih-18;
+ }else{
+  count=1+Math.floor(Math.random()*itemRowMax());
+  baseY=ground-ih-105-Math.floor(Math.random()*45);
+ }
+ // 段ボールの周囲にはアイテムを出さない。見た目にも少し余白を取る
+ const itemClearOfObstacles=(it)=>!obstacles.some(o=>{
+  let oy=ground-o.h;
+  if(o.platformId){let pp=platforms.find(p=>p.id===o.platformId);if(pp)oy=pp.top-o.h+8}
+  const marginX=42,marginY=22;
+  return it.x<o.x+o.w+marginX&&it.x+it.w>o.x-marginX&&it.y<oy+o.h+marginY&&it.y+it.h>oy-marginY;
+ });
+ // アイテム本体が平台の画像領域に重ならないようにする。
+ // 平台上のアイテムは天板より上にあるので、この判定をそのまま通過できる。
+ const itemClearOfPlatforms=(it)=>!platforms.some(pl=>
+  it.x<pl.x+pl.w&&it.x+it.w>pl.x&&it.y<pl.top+pl.h&&it.y+it.h>pl.top
+ );
+ // 横並びの形をなるべく保ったまま、重なる場合は列全体を右へずらして再試行
+ let placed=false;
+ for(let attempt=0;attempt<8&&!placed;attempt++){
+  const shift=attempt*gap;
+  const row=[];
+  let fits=true;
+  for(let n=0;n<count;n++){
+   const it={x:baseX+shift+n*gap,y:baseY,w:iw,h:ih};
+   if(!itemClearOfObstacles(it)||!itemClearOfPlatforms(it)){fits=false;break}
+   // すでに出ているアイテム／同じ列のアイテム同士が重ならないようにする
+   const itemMargin=10;
+   const overlapsItem=(other)=>it.x<other.x+other.w+itemMargin&&it.x+it.w>other.x-itemMargin&&it.y<other.y+other.h+itemMargin&&it.y+it.h>other.y-itemMargin;
+   if(collectibles.some(overlapsItem)||row.some(overlapsItem)){fits=false;break}
+   // 平台上の列は平台からはみ出させない
+   if(active.length&&r<.38){
+    const pl=active[active.length-1];
+    if(it.x<pl.x+45||it.x+it.w>pl.x+pl.w-45){fits=false;break}
+   }
+   row.push(it);
+  }
+  if(fits){collectibles.push(...row);placed=true}
+ }
+ // どうしても列を置けない場合は今回は見送り、段ボールとの重なりを最優先で防ぐ
+ // アイテム量は多いまま維持。ただし列としてまとまりを作る
+ const dl=difficultyLevel();
+ itemSpawnT=(.72+Math.random()*.63)*(1-dl*.08);
+}
+function hit(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
+// ゲーム背景は画面全体(1280x720)に収める。上下の引き伸ばし余白は作らない。
+// 横スクロール時の継ぎ目防止のため、隣の背景と2px重ねて描画する。
+function cover(im,x){
+ const w=1280,h=720;
+ const dx=Math.round(x)-1;
+ ctx.drawImage(im,0,0,im.width,im.height,dx,0,w+2,h);
+ return w;
+}
+function draw(){ctx.clearRect(0,0,1280,720);if(bg.length){let im=bg[bgIndex],w=cover(im,-bgOffset);cover(im,w-bgOffset);cover(im,w*2-bgOffset)}if(platformImg){for(let p of platforms)ctx.drawImage(platformImg,p.x,p.top,p.w,p.h)}for(let o of obstacles){let oy=ground-o.h;if(o.platformId){let pp=platforms.find(p=>p.id===o.platformId);if(pp)oy=pp.top-o.h+8}ctx.drawImage(obsImgs[o.idx],o.x,oy,o.w,o.h);}for(let it of collectibles){let im=itemImgs[selected];if(im){ctx.save();const pulse=14+8*(.5+.5*Math.sin(performance.now()/150));ctx.shadowColor='#fff36a';ctx.shadowBlur=pulse;ctx.drawImage(im,it.x,it.y,it.w,it.h);ctx.shadowColor='#ffffff';ctx.shadowBlur=8;ctx.drawImage(im,it.x,it.y,it.w,it.h);ctx.restore()}}let h=heroes[selected];if(h)ctx.drawImage(h,115,ground-heroH-y,heroW,heroH)}const resultCharacterSrc={kyabecchi:'assets/result_kyabecchi.png',ajihei:'assets/result_ajihei.png',uinta:'assets/result_uinta.png',koromi:'assets/result_koromi.png',panna:'assets/result_panna.png',tamachan:'assets/result_tamachan.png',senbei:'assets/result_senbei.png',aimy:'assets/result_aimy.png'};
+const resultLines={
+kyabecchi:{first:'やったー！1位だー！',rank:r=>`やったね！${r}位だよ！`,out:'もういっかい！つぎはもっといけるよ！'},
+ajihei:{first:'よっしゃー！1位だぜ！',rank:r=>`よっしゃ！${r}位だぜ！`,out:'まだまだ！もう一丁いくぞ！'},
+uinta:{first:'やったー！1位だーっ！',rank:r=>`やった！${r}位だよ！`,out:'まだいける！もういっかい！'},
+koromi:{first:'え、ウチら1位じゃん！マジ最高〜♡',rank:r=>`やばっ！${r}位じゃん！アガる〜♡`,out:'まだいけるっしょ！もっかいやろ〜♡'},
+panna:{first:'わぁ〜、1位だぁ〜♪',rank:r=>`わぁ〜♪ ${r}位だよ〜`,out:'もういっかい、のんびりいこ〜'},
+tamachan:{first:'やったね！1位だよ！',rank:r=>`すごい！${r}位だよ！`,out:'つぎはもっといけるよ！'},
+senbei:{first:'ほっほ〜！1位とはめでたいのぉ！',rank:r=>`おぉ〜！${r}位じゃ！`,out:'いや〜、走った走った！もう一回じゃ！'},
+aimy:{first:'やった！1位って最高〜♪',rank:r=>`いい感じ〜♪ ${r}位だよ！`,out:'まだまだこれから♪もう一回いこ！'}};
+function showResultCharacter(rank){resultCharacterImg.src=resultCharacterSrc[selected]||resultCharacterSrc.kyabecchi;const s=resultLines[selected]||resultLines.kyabecchi;resultSpeech.textContent=rank===1?s.first:(rank>=2&&rank<=10?s.rank(rank):s.out)}
+function gameOver(){running=false;stopAudio(audio.game);playAudio(audio.over,true);let d=Math.floor(distance),pts=d*itemCount;final.textContent=d;finalItemName.textContent=itemInfo[selected].name;finalItems.textContent=itemCount;finalCalc.textContent=d.toLocaleString('ja-JP')+'m × '+itemCount+'個';finalPoints.textContent=pts.toLocaleString('ja-JP');const resultRank=saveScore(selected,d,itemCount);showResultCharacter(resultRank);over.classList.remove('hide')}function loop(t){if(!running)return;let dt=Math.min(.033,(t-last)/1000);last=t;let speed=currentSpeed();distance+=dt*10;score.textContent=Math.floor(distance);distanceLive.textContent=Math.floor(distance);
+ const prevBottom=ground-y;
+ vy-=1900*dt;y+=vy*dt;
+ let heroLeft=115,heroRight=115+heroW,newBottom=ground-y,landed=false;
+ if(vy<=0){for(let p of platforms){if(heroRight>p.x+8&&heroLeft<p.x+p.w-8&&prevBottom<=p.top+8&&newBottom>=p.top){y=ground-p.top;vy=0;jumpCount=0;landed=true;break}}}
+ if(!landed&&y<0){y=0;vy=0;jumpCount=0}
+ // 平台の端から出たら、そのまま床へ落下する
+ if(vy===0&&y>0){let bottom=ground-y;let supported=platforms.some(p=>heroRight>p.x+8&&heroLeft<p.x+p.w-8&&Math.abs(bottom-p.top)<4);if(!supported)vy=-1}
+ bgOffset+=speed*dt;if(bg.length){let s=1280/bg[bgIndex].width,w=bg[bgIndex].width*s;if(bgOffset>=w){bgOffset%=w;bgIndex=0}}
+ platformSpawnT-=dt;if(platformSpawnT<=0)spawnPlatform();
+ spawnT-=dt;if(spawnT<=0)spawn();
+ for(let p of platforms)p.x-=speed*dt;platforms=platforms.filter(p=>p.x+p.w>-220);
+ for(let o of obstacles){o.x-=speed*dt;if(o.platformId){let pp=platforms.find(p=>p.id===o.platformId);if(pp)o.x=pp.x+o.relX}}obstacles=obstacles.filter(o=>o.x>-200&&(!o.platformId||platforms.some(p=>p.id===o.platformId)));
+itemSpawnT-=dt;if(itemSpawnT<=0)spawnItem();
+for(let it of collectibles)it.x-=speed*dt;
+collectibles=collectibles.filter(it=>it.x>-120);
+let p={x:122,y:ground-heroH-y+20,w:123,h:83};
+for(let i=collectibles.length-1;i>=0;i--){let it=collectibles[i];let b={x:it.x+8,y:it.y+8,w:it.w-16,h:it.h-16};if(hit(p,b)){itemCount++;itemCountLive.textContent=itemCount;playItemGet();collectibles.splice(i,1)}}
+for(let o of obstacles){
+ let oy=ground-o.h;if(o.platformId){let pp=platforms.find(p=>p.id===o.platformId);if(pp)oy=pp.top-o.h+8}const m=obstacleShapeMasks[o.idx];
+ const gy0=Math.max(0,Math.floor((p.y-oy)/o.h*obstacleMaskN));
+ const gy1=Math.min(obstacleMaskN-1,Math.floor((p.y+p.h-oy)/o.h*obstacleMaskN));
+ let obstacleHit=false;
+ if(gy1>=gy0){
+  for(let gy=gy0;gy<=gy1&&!obstacleHit;gy++){
+   const cy0=oy+gy*o.h/obstacleMaskN,cy1=oy+(gy+1)*o.h/obstacleMaskN;
+   if(p.y>=cy1||p.y+p.h<=cy0)continue;
+   for(const run of m[gy]){
+    const rx0=o.x+run[0]*o.w/obstacleMaskN,rx1=o.x+run[1]*o.w/obstacleMaskN;
+    if(p.x<rx1&&p.x+p.w>rx0){obstacleHit=true;break}
+   }
+  }
+ }
+ if(obstacleHit){draw();gameOver();return}
+}draw();requestAnimationFrame(loop)}home.addEventListener('pointerdown',unlockAudio,{once:true});startHot.onclick=begin;retry.onclick=begin;back.onclick=goHome;homeBtn.onclick=goHome;C.addEventListener('pointerdown',jump);window.addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='ArrowUp')&&gameScreen.style.display==='block'){e.preventDefault();jump()}});window.addEventListener('orientationchange',()=>setTimeout(()=>{if(waitingForLandscape&&!isMobilePortrait())begin()},180));window.addEventListener('resize',()=>{if(waitingForLandscape&&!isMobilePortrait())begin()});draw();
+</script></body></html>

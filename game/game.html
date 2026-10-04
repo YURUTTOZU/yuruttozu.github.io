@@ -1,0 +1,1588 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>くぬぎや ナンバータッチ v44 ナンバーの裏からキャラ登場</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:"Yu Gothic","Meiryo",sans-serif;background:#061a35}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:auto}
+.screen{display:none}.screen.active{display:block}
+#home{position:relative;background-image:url(assets/background_home.png);width:min(100vw,150vh);height:min(100vh,66.6666667vw);min-height:0;margin:auto;background-size:contain;background-position:center;background-repeat:no-repeat}
+.hot{position:absolute;border:0!important;outline:0!important;background:transparent!important;box-shadow:none!important;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.hot::after{content:attr(data-name);position:absolute;left:50%;bottom:0;transform:translateX(-50%);background:#08794a;color:#fff;border:2px solid white;border-radius:9px;padding:3px 8px;font-weight:900;white-space:nowrap;opacity:0}
+.hot.sel::after{opacity:1}
+.menu{position:absolute;left:50%;bottom:1.5%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:#fffffff0;border:4px solid #fff;border-radius:18px;padding:8px 11px}
+#pick{font-weight:900;color:#08794a;white-space:nowrap}button.action{border:0;border-radius:13px;padding:10px 16px;color:#fff;font-weight:900;cursor:pointer;font-size:16px}#start{background:#f06b35}#rankBtn{background:#08794a}
+#ranking{position:relative;background-image:url(assets/background_game.png);width:min(100vw,150vh);height:min(100vh,66.6666667vw);min-height:0;margin:auto;background-size:contain;background-position:center;background-repeat:no-repeat}
+.rankPanel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(470px,86%);background:#fffffff2;border:6px solid #fff;border-radius:25px;padding:18px;text-align:center;box-shadow:0 12px 35px #0008}
+.rankPanel h2{margin:0 0 12px;color:#08794a;font-size:30px}.rankrow{display:grid;grid-template-columns:60px 1fr 1fr;gap:5px;padding:7px;border-bottom:1px dashed #bbb;font-weight:900}.empty{padding:25px;font-weight:900}#rankHome{background:#08794a;margin-top:14px}
+#game{position:relative;width:min(100vw,150vh);height:min(100vh,66.6666667vw);min-height:0;margin:auto;
+    background-image:url("assets/background_result.png");background-size:contain;background-position:center;background-repeat:no-repeat;padding:0}.card{position:absolute;inset:0;margin:0;background:transparent;border:0;padding:0;text-align:center}.top{position:absolute;z-index:4;top:19.5%;left:50%;transform:translateX(-50%);width:min(570px,50%);display:flex;justify-content:space-between;align-items:center;
+    background:#fffffff0;border:3px solid #fff;border-radius:16px;padding:6px 12px;box-shadow:0 5px 16px #0004}#chosen{font-size:22px;font-weight:900;color:#08794a}.hud{display:flex;gap:8px}.pill{background:#fff0b6;border-radius:15px;padding:8px 14px;font-weight:900}.pill b{font-size:27px;color:#ef5a3d}.grid{position:absolute;z-index:3;left:50%;top:29.5%;transform:translateX(-50%);width:min(520px,43%);display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0}.num{aspect-ratio:1;border:3px solid #fff;border-radius:14px;font-size:clamp(17px,1.9vw,28px);font-weight:1000;
+    background:linear-gradient(145deg,#fff,#ffd45d);box-shadow:0 4px #d99d22,0 5px 12px #0003;cursor:pointer}.num.done{visibility:hidden}.num.bad{background:#ff9b9b}.ctrl{border:0;border-radius:13px;padding:9px 16px;margin:4px;background:#08794a;color:#fff;font-weight:900;cursor:pointer}#gameControls{position:absolute;z-index:4;left:50%;bottom:3.5%;transform:translateX(-50%);background:#ffffffe8;border:3px solid #fff;border-radius:16px;padding:3px 7px}#result{display:none;position:absolute;z-index:6;left:25%;right:25%;top:35%;background:#fffffff7;border:5px solid #ffc84b;border-radius:24px;padding:25px;font-size:25px;font-weight:900}#result strong{font-size:44px;color:#f45d3d}
+@media(max-width:700px){#game .top{width:54%;top:19.5%}#game .grid{width:45%;top:30%;gap:4px}.num{border-radius:10px;border-width:2px}.menu{padding:5px;gap:4px}#pick{font-size:11px}button.action{font-size:11px;padding:7px}.top{flex-direction:column}.num{font-size:22px}}
+</style><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800;900&display=swap" rel="stylesheet">
+
+<style>
+html,body,button,input,select,
+#pick,#chosen,.pill,.num,#result,.rankPanel,.rankPanel *,
+.action,.ctrl,#gameControls,#gameControls * {
+  font-family: "M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Yu Gothic","Meiryo",sans-serif !important;
+}
+.num { font-weight: 900 !important; }
+button,.action,.ctrl,#pick,#chosen,.pill,.rankPanel { font-weight: 800 !important; }
+</style>
+
+<style>
+/* v19: ゲーム画面のストップウォッチだけ大きく */
+#timer, #time, #stopwatch, .timer, .time, .stopwatch {
+  font-size: clamp(34px, 3.6vw, 56px) !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  letter-spacing: .02em !important;
+}
+</style>
+
+<style>
+/* v20: 次○を左、ストップウォッチを右。同じ大きさ */
+#game .top{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  transform:none !important;
+  background:transparent !important;
+  border:0 !important;
+  border-radius:0 !important;
+  padding:0 !important;
+  box-shadow:none !important;
+  pointer-events:none !important;
+}
+
+/* HUD内の表示を共通サイズに */
+#game .top > *{
+  position:absolute !important;
+  top:51% !important;
+  transform:translateY(-50%) !important;
+  font-size:clamp(34px,3.6vw,56px) !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+}
+
+/* 左：次○ */
+#game #next, #game .next{
+  left:10.5% !important;
+  right:auto !important;
+}
+
+/* 右：ストップウォッチ */
+#game #timer, #game #time, #game #stopwatch,
+#game .timer, #game .time, #game .stopwatch{
+  right:10.5% !important;
+  left:auto !important;
+  font-size:clamp(34px,3.6vw,56px) !important;
+}
+
+/* もしHUDが2要素だけなら、IDに関係なく左右へ配置 */
+#game .top > *:first-child{
+  left:10.5% !important;
+  right:auto !important;
+}
+#game .top > *:last-child{
+  right:10.5% !important;
+  left:auto !important;
+}
+</style>
+
+<style>
+/* v20 final positioning */
+#game .top .hud{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  display:block !important;
+  pointer-events:none !important;
+}
+#game .top .hud .pill{
+  position:absolute !important;
+  top:51% !important;
+  transform:translateY(-50%) !important;
+  margin:0 !important;
+  font-size:clamp(34px,3.6vw,56px) !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+}
+#game .top .hud .pill:first-child{
+  left:10.5% !important;
+  right:auto !important;
+}
+#game .top .hud .pill:last-child{
+  right:10.5% !important;
+  left:auto !important;
+}
+#game #next,#game #time{
+  font-size:inherit !important;
+  font-weight:900 !important;
+}
+</style>
+
+<style>
+/* v21: 次○とストップウォッチをナンバーの真横まで下げる */
+#game .top .hud .pill{
+  top:56% !important;
+}
+#game .top .hud .pill:first-child{
+  left:14% !important;
+  right:auto !important;
+}
+#game .top .hud .pill:last-child{
+  right:14% !important;
+  left:auto !important;
+}
+</style>
+
+<style>
+/* v22: 次○とストップウォッチをさらに下へ */
+#game .top .hud .pill{
+  top:64% !important;
+}
+</style>
+
+<style>
+/* v24: HUDを確実に表示し、ナンバーのすぐ上に固定 */
+#game .top{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  pointer-events:none !important;
+}
+#game .top .hud{
+  display:flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  position:absolute !important;
+  top:24.5% !important;
+  left:50% !important;
+  right:auto !important;
+  bottom:auto !important;
+  width:min(520px,43%) !important;
+  height:auto !important;
+  transform:translateX(-50%) !important;
+  justify-content:space-between !important;
+  align-items:center !important;
+  gap:18px !important;
+}
+#game .top .hud .pill,
+#game .top .hud .pill:first-child,
+#game .top .hud .pill:last-child{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  position:static !important;
+  top:auto !important;
+  left:auto !important;
+  right:auto !important;
+  bottom:auto !important;
+  transform:none !important;
+  margin:0 !important;
+  font-size:clamp(34px,3.6vw,56px) !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+}
+#game #next,#game #time{
+  display:inline !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  font-size:inherit !important;
+  font-weight:900 !important;
+}
+</style>
+
+<style>
+/* v25: HUDとナンバーの重なり解消 */
+#game .top .hud{
+  top:23.5% !important;
+}
+#game .grid{
+  top:34% !important;
+}
+</style>
+
+<style>
+/* v26: HUD・ナンバー・下ボタンの3段を重ならないよう調整 */
+#game .top .hud{
+  top:23% !important;
+}
+#game .grid{
+  top:32% !important;
+  width:min(455px,37.5%) !important;
+  gap:5px !important;
+}
+#gameControls{
+  bottom:2.5% !important;
+}
+</style>
+
+<style>
+/* v27: ナンバーを少し大きく */
+#game .grid{
+  top:31.5% !important;
+  width:min(485px,40%) !important;
+  gap:5px !important;
+}
+#game .num{
+  font-size:clamp(19px,2.15vw,31px) !important;
+}
+</style>
+
+<style>
+/* v28: 5×5ナンバーだけ少し下へ */
+#game .grid{
+  top:33% !important;
+}
+</style>
+
+<style>
+/* v29: 色とりどりのポップなナンバー */
+#game .num{
+  color:#3d3a45 !important;
+  border:3px solid rgba(255,255,255,.96) !important;
+  box-shadow:0 4px 0 rgba(80,65,70,.20), 0 6px 12px rgba(0,0,0,.16) !important;
+  text-shadow:0 2px 0 rgba(255,255,255,.65) !important;
+}
+#game .num:nth-child(8n+1){background:linear-gradient(145deg,#ff9eb5,#ffcad6) !important;}
+#game .num:nth-child(8n+2){background:linear-gradient(145deg,#ffd166,#ffe59d) !important;}
+#game .num:nth-child(8n+3){background:linear-gradient(145deg,#80e1c1,#b7f3df) !important;}
+#game .num:nth-child(8n+4){background:linear-gradient(145deg,#83c9ff,#bee4ff) !important;}
+#game .num:nth-child(8n+5){background:linear-gradient(145deg,#c7a3ff,#e0ccff) !important;}
+#game .num:nth-child(8n+6){background:linear-gradient(145deg,#ffb36b,#ffd1a3) !important;}
+#game .num:nth-child(8n+7){background:linear-gradient(145deg,#9bdd75,#c8f0ad) !important;}
+#game .num:nth-child(8n){background:linear-gradient(145deg,#ff94dc,#ffc7ed) !important;}
+#game .num:hover{filter:brightness(1.06) saturate(1.08);}
+#game .num:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(80,65,70,.20),0 3px 7px rgba(0,0,0,.14) !important;}
+</style>
+
+<style>
+/* v30: クリアタイムを大きく＋選択キャラの喜び表示 */
+#result #final{
+  display:block !important;
+  font-size:clamp(48px,6vw,82px) !important;
+  font-weight:900 !important;
+  line-height:1.05 !important;
+  margin:10px 0 6px !important;
+  color:#ff6b55 !important;
+  text-shadow:0 3px 0 #fff,0 5px 10px rgba(0,0,0,.16) !important;
+}
+#clearCharacterWrap{
+  height:clamp(115px,17vh,180px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:2px auto 6px;
+}
+#clearCharacter{
+  display:block;
+  max-height:100%;
+  max-width:220px;
+  object-fit:contain;
+  filter:drop-shadow(0 5px 5px rgba(0,0,0,.20));
+  animation:clearHappy .65s ease-in-out infinite alternate;
+}
+@keyframes clearHappy{
+  from{transform:translateY(3px) rotate(-2deg) scale(1)}
+  to{transform:translateY(-7px) rotate(2deg) scale(1.05)}
+}
+</style>
+
+<style>
+/* v31: クリア後キャラクターを切らずに全身表示 */
+#clearCharacterWrap{
+  width:min(300px,48vw) !important;
+  height:clamp(120px,20vh,210px) !important;
+  overflow:visible !important;
+  margin:4px auto 8px !important;
+}
+#clearCharacter{
+  width:100% !important;
+  height:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  overflow:visible !important;
+}
+#result{
+  overflow:visible !important;
+}
+</style>
+
+<style>
+/* v32: きゃべっちの全身が必ず収まるよう余白込み表示 */
+#clearCharacter{
+  object-fit:contain !important;
+  object-position:center center !important;
+  padding:8px !important;
+  box-sizing:border-box !important;
+}
+</style>
+<style>
+/* たまちゃん・アイミーだけ少し縮小して足まで全身表示 */
+#clearCharacter.fitWholeBody{
+ width:84% !important;height:84% !important;
+ max-width:84% !important;max-height:84% !important;
+ object-fit:contain !important;object-position:center center !important;
+ padding:10px !important;box-sizing:border-box !important;
+}
+</style>
+<style>
+/* v35: クリア後キャラクター個別サイズ調整 */
+#clearCharacter.clearLarge{
+  width:100% !important;
+  height:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  padding:2px !important;
+  box-sizing:border-box !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+}
+#clearCharacter.fitWholeBody{
+  width:76% !important;
+  height:76% !important;
+  max-width:76% !important;
+  max-height:76% !important;
+  padding:12px !important;
+  box-sizing:border-box !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+}
+</style>
+
+<style>
+/* v36: きゃべっちをパンナと同じクリア表示サイズに統一 */
+#clearCharacter.clearLarge{
+  width:100% !important;
+  height:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  padding:2px !important;
+  box-sizing:border-box !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+}
+</style>
+<style>
+/* v37: 指定画像のたまちゃん・アイミーを全身表示 */
+#clearCharacter.fitWholeBody{
+ width:82% !important;height:82% !important;
+ max-width:82% !important;max-height:82% !important;
+ padding:4px !important;box-sizing:border-box !important;
+ object-fit:contain !important;object-position:center center !important;
+}
+</style>
+<style>
+#countdownOverlay{
+ position:absolute; inset:0; z-index:9999;
+ display:none; align-items:center; justify-content:center;
+ background:rgba(255,255,255,.12);
+ pointer-events:auto;
+}
+#countdownOverlay.show{display:flex !important;}
+#countdownText{
+ font-family:'M PLUS Rounded 1c',sans-serif;
+ font-size:clamp(150px,30vw,390px);
+ font-weight:900; line-height:.9;
+ color:#fff;
+ -webkit-text-stroke:clamp(5px,.7vw,10px) #ff6b55;
+ text-shadow:0 8px 0 rgba(0,0,0,.16),0 12px 30px rgba(0,0,0,.28);
+ text-align:center;
+ animation:countPop .7s ease both;
+}
+#countdownText.startWord{
+ font-size:clamp(90px,15vw,210px);
+ white-space:nowrap;
+ color:#fff86b;
+ -webkit-text-stroke:clamp(5px,.7vw,10px) #ff6b55;
+}
+@keyframes countPop{
+ 0%{transform:scale(.45);opacity:0}
+ 35%{transform:scale(1.12);opacity:1}
+ 100%{transform:scale(1);opacity:1}
+}
+</style>
+
+<style>
+/* v39: クリア後8人をパンナ基準の同一表示サイズに統一 */
+#clearCharacter,
+#clearCharacter.clearLarge,
+#clearCharacter.fitWholeBody{
+  width:100% !important;
+  height:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  padding:2px !important;
+  box-sizing:border-box !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+}
+</style>
+<style>
+/* v40: クリア後8人をパンナ基準の同一キャンバス・同一表示寸法に統一 */
+#clearCharacter,
+#clearCharacter.clearLarge,
+#clearCharacter.fitWholeBody{
+ width:100% !important;height:100% !important;
+ max-width:100% !important;max-height:100% !important;
+ padding:2px !important;box-sizing:border-box !important;
+ object-fit:contain !important;object-position:center center !important;
+}
+</style>
+<style>
+/* v41: コロミさん・せんべえのクリア後サイズ補正 */
+#clearCharacter.sizeMatch{
+  transform:scale(1.14);
+  transform-origin:center center;
+}
+#clearCharacter.sizeMatch.clearLarge,
+#clearCharacter.sizeMatch.fitWholeBody{
+  transform:scale(1.14);
+}
+</style>
+<style>
+/* v42: コロミさん・せんべえを他キャラの見た目サイズへ */
+#clearCharacterWrap.sizeMatchWrap{
+  transform:scale(1.14) !important;
+  transform-origin:center center !important;
+}
+</style>
+<style>
+/* v43: コロミさん・せんべえも他キャラと同じ喜ぶ動きを復活 */
+#clearCharacter.sizeMatch{
+  animation:clearHappy .65s ease-in-out infinite alternate !important;
+}
+</style>
+<style>
+#game .grid{overflow:hidden !important;isolation:isolate;}
+#game .grid::before{
+ content:"";position:absolute;inset:3%;z-index:0;pointer-events:none;
+ background-image:var(--grid-character);
+ background-size:contain;background-repeat:no-repeat;background-position:center;
+}
+#game .grid .num{position:relative;z-index:2;}
+#game .grid .num.revealed{
+ opacity:0 !important;visibility:hidden !important;pointer-events:none !important;
+}
+</style>
+<style>
+#soundToggle{
+  font-size:clamp(13px,1.2vw,17px)!important;
+  font-weight:900!important;
+  padding:.58em 1.05em!important;
+  color:#5b4350!important;
+  background:linear-gradient(145deg,#fff0a8,#ffd3e5)!important;
+  border:3px solid rgba(255,255,255,.96)!important;
+  border-radius:999px!important;
+  box-shadow:0 4px 0 rgba(122,91,103,.20),0 6px 12px rgba(0,0,0,.14)!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.8)!important;
+}
+#soundToggle:hover{filter:brightness(1.04)}
+#soundToggle:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(122,91,103,.20)!important}
+</style>
+
+<style>
+#home #start,
+#home #rankBtn{
+  min-width:clamp(145px,13.5vw,205px) !important;
+  width:auto !important;
+  white-space:nowrap !important;
+  padding-left:1.15em !important;
+  padding-right:1.15em !important;
+}
+</style>
+
+<style>
+#soundToggle{
+  width:auto !important;
+  min-width:clamp(155px,14vw,220px) !important;
+  white-space:nowrap !important;
+  writing-mode:horizontal-tb !important;
+  word-break:keep-all !important;
+  flex-shrink:0 !important;
+}
+</style>
+
+<style>
+#home .char.selected::after{
+  top:-12% !important;
+  bottom:auto !important;
+  left:50% !important;
+  transform:translateX(-50%) !important;
+  white-space:nowrap !important;
+  z-index:20 !important;
+}
+</style>
+
+<style>
+#home .hot.sel::after{
+  top:-10% !important;
+  bottom:auto !important;
+  left:50% !important;
+  transform:translate(-50%,-100%) !important;
+  white-space:nowrap !important;
+  z-index:30 !important;
+}
+</style>
+
+<style>
+#home .hot.sel::after{
+  font-size:2em !important;
+  padding:6px 16px !important;
+  border-radius:14px !important;
+  line-height:1.15 !important;
+}
+</style>
+
+<style>
+#home .hot.sel::after{
+  top:8% !important;
+  bottom:auto !important;
+  transform:translate(-50%,-50%) !important;
+}
+</style>
+
+<style>
+#rankSpeech.rankSpeech{
+  display:block !important;
+  position:relative;
+  max-width:92%;
+  margin:10px auto 8px;
+  padding:12px 18px;
+  border:4px solid #fff;
+  border-radius:22px;
+  font-size:clamp(16px,1.65vw,24px);
+  font-weight:900;
+  line-height:1.45;
+  text-align:center;
+  color:#3f3940;
+  box-shadow:0 5px 0 rgba(80,65,70,.16),0 8px 18px rgba(0,0,0,.14);
+  animation:speechPop .38s cubic-bezier(.2,1.4,.4,1);
+}
+#rankSpeech.rankSpeech::before{
+  content:"";
+  position:absolute;
+  left:50%; top:-15px;
+  transform:translateX(-50%) rotate(45deg);
+  width:22px;height:22px;
+  background:inherit;
+  border-left:4px solid #fff;
+  border-top:4px solid #fff;
+}
+@keyframes speechPop{
+  0%{opacity:0;transform:scale(.75)}
+  100%{opacity:1;transform:scale(1)}
+}
+
+/* 8キャラそれぞれの文字・色 */
+#rankSpeech.charSpeech0{background:#dff7b9;color:#39731f;font-family:"Hachi Maru Pop","Yomogi","M PLUS Rounded 1c",cursive;letter-spacing:.04em}
+#rankSpeech.charSpeech1{background:#d9f1ff;color:#12669b;font-family:"Klee One","Zen Kurenaido","Yu Gothic",sans-serif;font-weight:600;letter-spacing:.03em}
+#rankSpeech.charSpeech2{background:#ffe1b5;color:#d85b18;font-family:"Hachi Maru Pop","Yomogi","M PLUS Rounded 1c",cursive;letter-spacing:.06em}
+#rankSpeech.charSpeech3{background:#ffd9e8;color:#a83c72;font-family:"Yomogi","Hachi Maru Pop","M PLUS Rounded 1c",cursive;letter-spacing:.04em}
+#rankSpeech.charSpeech4{background:#fff0c9;color:#8b6531;font-family:"Zen Kurenaido","Yomogi","Yu Gothic",sans-serif;letter-spacing:.035em}
+#rankSpeech.charSpeech5{background:#fff7c9;color:#8c7927;font-family:"Yomogi","Zen Kurenaido","Meiryo",cursive;font-weight:400;letter-spacing:.05em}
+#rankSpeech.charSpeech6{background:#ead7bc;color:#6f4b2c;font-family:"Klee One","Zen Kurenaido","Yu Mincho",serif;font-weight:600;letter-spacing:.035em}
+#rankSpeech.charSpeech7{background:#dff7ff;color:#2476a8;font-family:"Hachi Maru Pop","Yomogi","M PLUS Rounded 1c",cursive;letter-spacing:.045em}
+
+#rankSpeech.firstPlace{
+  font-size:clamp(19px,2vw,29px);
+  border-color:#fff4a8;
+  box-shadow:0 0 0 4px #ffc928,0 6px 0 rgba(160,100,0,.18),0 10px 22px rgba(255,190,0,.25);
+}
+#rankSpeech.firstPlace::after{
+  content:"👑";
+  position:absolute;
+  right:-10px;
+  top:-24px;
+  font-size:34px;
+  transform:rotate(12deg);
+}
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop&family=Klee+One:wght@600&family=Yomogi&family=Zen+Kurenaido&display=swap" rel="stylesheet">
+
+<style>
+#rankSpeech.rankSpeech{
+  font-weight:600 !important;
+  text-shadow:1px 1px 0 rgba(255,255,255,.72);
+}
+#rankSpeech.charSpeech0,#rankSpeech.charSpeech2,#rankSpeech.charSpeech7{font-weight:400 !important;}
+#rankSpeech.charSpeech3,#rankSpeech.charSpeech5{font-weight:400 !important;}
+#rankSpeech.firstPlace{font-weight:600 !important;}
+</style>
+
+<style id="iphone-all4-final">
+@media (orientation:portrait){
+  html,body{
+    margin:0!important;width:100%!important;height:100%!important;min-height:100dvh!important;
+    background:#000!important;overflow:hidden!important;display:block!important;
+  }
+  .screen{
+    display:none!important;position:relative!important;
+    width:min(100vw,66.6667dvh)!important;
+    height:min(100dvh,150vw)!important;
+    min-height:0!important;margin:0 auto!important;
+    background-size:100% 100%!important;background-position:center!important;background-repeat:no-repeat!important;
+  }
+  .screen.active{display:block!important}
+
+  /* 2枚目：ゲームホーム */
+  #home{background-image:url("assets/iphone_game_home.jpg")!important}
+  #home .menu{
+    position:absolute!important;inset:0!important;transform:none!important;
+    background:transparent!important;border:0!important;padding:0!important;margin:0!important;
+    display:block!important;pointer-events:none!important;
+  }
+  #home #pick{display:none!important}
+  #home .menu .action{
+    position:absolute!important;opacity:0!important;pointer-events:auto!important;
+    margin:0!important;padding:0!important;border:0!important;
+  }
+  #start{left:17%!important;top:72.7%!important;width:66%!important;height:8.2%!important}
+  #rankBtn{left:17%!important;top:82.1%!important;width:35%!important;height:5.5%!important}
+  #soundToggle{left:54%!important;top:82.1%!important;width:31%!important;height:5.5%!important}
+  #home .hot{
+    top:90.2%!important;height:8.4%!important;width:11%!important;
+    border:0!important;background:transparent!important;
+  }
+  #home .hot:nth-of-type(1){left:5%!important}
+  #home .hot:nth-of-type(2){left:16.5%!important}
+  #home .hot:nth-of-type(3){left:28%!important}
+  #home .hot:nth-of-type(4){left:39.5%!important}
+  #home .hot:nth-of-type(5){left:51%!important}
+  #home .hot:nth-of-type(6){left:62.5%!important}
+  #home .hot:nth-of-type(7){left:74%!important}
+  #home .hot:nth-of-type(8){left:85.5%!important;width:9.5%!important}
+  #home .hot.sel::after{display:none!important}
+
+  /* 3枚目：ナンバータッチ */
+  #game{background-image:url("assets/iphone_number_touch.jpg")!important;padding:0!important}
+  #game .card{position:absolute!important;inset:0!important}
+  #game .top{
+    position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+    transform:none!important;background:transparent!important;border:0!important;
+    padding:0!important;box-shadow:none!important;display:block!important;
+  }
+  #chosen{display:none!important}
+  #game .hud{
+    position:absolute!important;left:19%!important;top:17.7%!important;width:62%!important;height:6.5%!important;
+    display:flex!important;justify-content:space-between!important;align-items:center!important;
+    gap:0!important;transform:none!important;
+  }
+  #game .pill{
+    position:static!important;background:transparent!important;padding:0!important;margin:0!important;
+    border:0!important;box-shadow:none!important;font-size:clamp(20px,6.5vw,34px)!important;
+    color:#111!important;line-height:1!important;
+  }
+  #game .pill b,#game #next,#game #time{
+    font-size:inherit!important;font-weight:900!important;color:#111!important;
+  }
+  #game #next{color:red!important}
+  #game .grid{
+    position:absolute!important;left:7.8%!important;top:25.4%!important;
+    transform:none!important;width:84.4%!important;
+    display:grid!important;grid-template-columns:repeat(5,1fr)!important;
+    gap:1.0vw!important;margin:0!important;
+  }
+  #game .num{
+    aspect-ratio:1/1!important;border:2px solid rgba(255,255,255,.95)!important;
+    border-radius:2.3vw!important;font-size:clamp(27px,8.2vw,47px)!important;
+    box-shadow:0 2px 4px #0002!important;color:#17131b!important;
+  }
+  #gameControls{
+    position:absolute!important;left:17%!important;bottom:1.7%!important;transform:none!important;
+    width:66%!important;height:6.8%!important;display:flex!important;gap:5%!important;
+    padding:0!important;background:transparent!important;border:0!important;
+  }
+  #gameControls .ctrl{flex:1!important;opacity:0!important;margin:0!important;padding:0!important}
+  #countdownOverlay{position:absolute!important;inset:0!important}
+  #result{
+    left:12%!important;right:12%!important;top:31%!important;padding:14px!important;
+    font-size:18px!important;z-index:20!important;
+  }
+  #result strong{font-size:38px!important}
+  #clearCharacterWrap{height:115px!important}
+
+  /* 4枚目：ランキング */
+  #ranking{background-image:url("assets/iphone_ranking.jpg")!important}
+  #ranking .rankPanel{
+    position:absolute!important;left:50%!important;top:49%!important;transform:translate(-50%,-50%)!important;
+    width:68%!important;max-height:52%!important;overflow:auto!important;
+    padding:12px!important;background:#fffffff2!important;border:4px solid #fff!important;
+    border-radius:18px!important;box-shadow:0 8px 24px #0005!important;
+  }
+  #ranking .rankPanel h2{font-size:22px!important;margin:0 0 6px!important}
+  #ranking .rankrow{
+    grid-template-columns:38px 1fr 1fr!important;gap:3px!important;
+    padding:4px!important;font-size:11px!important;
+  }
+  #rankHome{font-size:12px!important;padding:7px 10px!important;margin-top:7px!important}
+}
+</style>
+
+
+<style id="iphone-number-screen-fix">
+@media (orientation:portrait){
+  /* 背景画像内の見本UIを、実際に動くUIで完全に隠す */
+  #game .hud{
+    left:18.2%!important;
+    top:17.4%!important;
+    width:63.6%!important;
+    height:7.4%!important;
+    gap:1.4%!important;
+  }
+  #game .hud .pill{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    height:100%!important;
+    border-radius:3vw!important;
+    background:#fff4b8!important;
+    box-shadow:0 2px 6px #0002!important;
+    font-size:clamp(20px,6vw,31px)!important;
+    white-space:nowrap!important;
+  }
+  #game .hud .pill:first-child{width:43%!important}
+  #game .hud .pill:last-child{width:55.6%!important}
+
+  #game .grid{
+    left:7.5%!important;
+    top:25.25%!important;
+    width:85%!important;
+    padding:.8vw!important;
+    gap:1vw!important;
+    background:#fff7dc!important;
+    border-radius:2.5vw!important;
+    overflow:hidden!important;
+  }
+  /* iPhone版では、消えたマスの後ろから巨大キャラを出さない */
+  #game .grid::before{display:none!important}
+  #game .num{
+    visibility:visible!important;
+    opacity:1!important;
+    aspect-ratio:1/1!important;
+    font-size:clamp(27px,8vw,46px)!important;
+  }
+  #game .num.done,#game .num.revealed{
+    visibility:visible!important;
+    opacity:.14!important;
+    pointer-events:none!important;
+    color:transparent!important;
+  }
+}
+</style>
+
+
+<style id="iphone-fix-20260926-2320">
+@media (orientation:portrait){
+  /* 1. 背景画像に入っている「← ゲーム紹介へ」の文字部分を隠す */
+  #game::after{
+    content:""!important;position:absolute!important;z-index:2!important;
+    left:2.2%!important;top:1.3%!important;width:25.8%!important;height:5.1%!important;
+    background:#fff!important;border-radius:999px!important;pointer-events:none!important;
+  }
+
+  /* 2. 次○・ストップウォッチを上へ、小さく */
+  #game .hud{
+    left:24%!important;top:17.2%!important;width:52%!important;height:3.9%!important;gap:2%!important;
+    transform:none!important;
+  }
+  #game .hud .pill{
+    height:100%!important;padding:0 1%!important;
+    font-size:clamp(12px,3.65vw,20px)!important;
+    border-radius:1.6vw!important;line-height:1!important;
+  }
+  #game .hud .pill:first-child{width:34%!important;flex:0 0 34%!important}
+  #game .hud .pill:last-child{width:64%!important;flex:0 0 64%!important}
+
+  /* 3. 画像の「もう一度」「ホームへ」の文字を押した位置で反応させる */
+  #gameControls{
+    left:19.5%!important;top:83.1%!important;bottom:auto!important;
+    width:61%!important;height:7.2%!important;gap:4%!important;
+    transform:none!important;z-index:10!important;
+  }
+  #gameControls .ctrl{height:100%!important;pointer-events:auto!important}
+}
+</style>
+
+<style id="requested-square-status-only-20260927">
+@media (orientation:portrait){
+  /* 指定箇所以外は変更しない：5×5・背景・操作ボタン・ゲーム動作は現状維持 */
+  #game #iphoneStatus span:first-child,
+  #game #iphoneStatus > span:last-child{
+    width:19%!important;
+    height:auto!important;
+    aspect-ratio:1 / 1!important;
+    padding:0!important;
+    border-radius:2vw!important;
+    box-sizing:border-box!important;
+  }
+  #game #iphoneStatus span:first-child{
+    left:2%!important;
+    font-size:clamp(23px,7.1vw,38px)!important;
+    font-weight:900!important;
+    line-height:1!important;
+  }
+  #game #iphoneStatus > span:last-child{
+    right:2%!important;
+    left:auto!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:2%!important;
+    white-space:normal!important;
+  }
+  #game #iphoneStatus .iphoneTimerIcon{
+    position:static!important;
+    width:auto!important;
+    height:auto!important;
+    aspect-ratio:auto!important;
+    padding:0!important;
+    background:none!important;
+    border:0!important;
+    box-shadow:none!important;
+    display:block!important;
+    font-size:clamp(24px,7vw,38px)!important;
+    line-height:1!important;
+  }
+  #game #iphoneStatus .iphoneTimerValue{
+    position:static!important;
+    width:auto!important;
+    height:auto!important;
+    aspect-ratio:auto!important;
+    padding:0!important;
+    background:none!important;
+    border:0!important;
+    box-shadow:none!important;
+    display:block!important;
+    font-size:clamp(15px,4.5vw,24px)!important;
+    font-weight:900!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+  }
+}
+</style>
+</head><body>
+<section id="home" class="screen active"><button class="hot" data-name="きゃべっち" aria-label="きゃべっち" style="left:15.5%;top:50%;width:17.5%;height:25.5%"></button><button class="hot" data-name="パンナ" aria-label="パンナ" style="left:31%;top:48.5%;width:14.5%;height:25.5%"></button><button class="hot" data-name="あじへい" aria-label="あじへい" style="left:44.5%;top:49%;width:17.5%;height:26.5%"></button><button class="hot" data-name="ういんた" aria-label="ういんた" style="left:60%;top:47%;width:16.5%;height:28%"></button><button class="hot" data-name="コロミさん" aria-label="コロミさん" style="left:18.5%;top:67%;width:18.5%;height:28.5%"></button><button class="hot" data-name="たまちゃん" aria-label="たまちゃん" style="left:35.5%;top:68%;width:16%;height:28.5%"></button><button class="hot" data-name="せんべえ" aria-label="せんべえ" style="left:50%;top:67%;width:18.5%;height:30%"></button><button class="hot" data-name="アイミー" aria-label="アイミー" style="left:67%;top:66%;width:19%;height:31%"></button><div class="menu"><b style="font-size:10px;color:#08794a"></b><span id="pick">キャラクターを選んでね！</span><button id="start" class="action">ゲームスタート</button><button id="rankBtn" class="action">ランキング</button><button id="soundToggle" class="action" type="button">🔊 サウンド ON</button></div></section>
+<section id="ranking" class="screen"><div class="rankPanel"><h2>🏆 TOP10</h2><div id="rankList"></div><button id="rankHome" class="action">ホームへ</button></div></section>
+<section id="game" class="screen"><div id="iphoneStatus"><span>次 <b id="iphoneNext">1</b></span><span class="iphoneTimerBox"><span class="iphoneTimerIcon">⏱️</span><span class="iphoneTimerValue"><b id="iphoneTime">0.00</b></span></span></div><button id="introBackInGame" type="button">← ゲーム紹介へ</button><div id="countdownOverlay"><div id="countdownText">3</div></div><div class="card"><div class="top"><div id="chosen"></div><div class="hud"><div class="pill">次 <b id="next">1</b></div><div class="pill">⏱ <span id="time">0.00</span>秒</div></div></div><div id="grid" class="grid"></div><div id="gameControls"><button class="ctrl" id="retry">もう一度</button><button class="ctrl" id="gameHome">ホームへ</button></div><div id="result">クリア！<br><strong id="final"></strong><div id="clearCharacterWrap"><img id="clearCharacter" alt=""></div><div id="rankSpeech" class="rankSpeech"></div><span id="msg"></span><br><button class="ctrl" id="again">もう一度</button><button class="ctrl" id="resultHome">ホームへ</button></div></div></section>
+
+<audio id="audioHome" preload="auto" loop src="assets/music_home.wav"></audio>
+<audio id="audioGame" preload="auto" loop src="assets/music_game.wav"></audio>
+<audio id="audioClear" preload="auto" loop src="assets/music_clear.wav"></audio>
+<audio id="audioCountdown" preload="auto" src="assets/sound_countdown.wav"></audio>
+<audio id="audioCorrect" preload="auto" src="assets/sound_correct.wav"></audio>
+<audio id="audioWrong" preload="auto" src="assets/sound_wrong.wav"></audio>
+<audio id="audioTimeup" preload="auto" src="assets/sound_timeup.wav"></audio>
+
+<script>
+const names=["きゃべっち", "パンナ", "あじへい", "ういんた", "コロミさん", "たまちゃん", "せんべえ", "アイミー"];let selected=null,next=1,running=false,startAt=0,raf=0;
+const $=id=>document.getElementById(id), show=id=>{document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');window.scrollTo(0,0)};
+document.querySelectorAll('.hot').forEach((b,i)=>b.addEventListener('click',()=>{selected=i;document.querySelectorAll('.hot').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');$('pick').textContent='選択中：'+names[i]}));
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function board(){
+ let g=$('grid');g.innerHTML='';
+ if(selected!==null&&window.clearCharacterImages){
+   g.style.setProperty('--grid-character','url("'+window.clearCharacterImages[selected]+'")');
+ }
+ shuffle([...Array(25)].map((_,i)=>i+1)).forEach(n=>{
+   let b=document.createElement('button');b.className='num';b.textContent=n;
+   b.onclick=()=>tap(b,n);g.appendChild(b)
+ })
+}
+function tap(b,n){if(!running)return;if(n===next){playSfx('audioCorrect');b.classList.add('done','revealed');next++;$('next').textContent=next<=25?next:'✓';if(next===26)finish()}else{playSfx('audioWrong');b.classList.add('bad');setTimeout(()=>b.classList.remove('bad'),150)}}
+function tick(){if(!running)return;$('time').textContent=((performance.now()-startAt)/1000).toFixed(2);raf=requestAnimationFrame(tick)}
+function restart(){cancelAnimationFrame(raf);next=1;running=false;$('next').textContent='1';$('time').textContent='0.00';$('result').style.display='none';board()}
+function play(){if(selected===null){$('pick').textContent='先にキャラクターを選んでね！';return}$('chosen').textContent=names[selected]+'と挑戦！';show('game');restart()}
+function finish(){
+ running=false;cancelAnimationFrame(raf);playSceneMusic('clear');
+ let t=(performance.now()-startAt)/1000;
+ $('final').textContent=t.toFixed(2)+'秒';
+ $('clearCharacter').src=window.clearCharacterImages[selected];
+ $('clearCharacter').classList.toggle('fitWholeBody',selected===5||selected===7);
+ $('clearCharacter').classList.toggle('clearLarge',selected===0||selected===1);
+ $('clearCharacter').classList.toggle('sizeMatch',selected===4||selected===6);
+ $('clearCharacterWrap').classList.toggle('sizeMatchWrap',selected===4||selected===6);
+ $('msg').textContent='';
+
+ let r=JSON.parse(localStorage.getItem('kunugiyaNT')||'[]');
+ let record={t,n:names[selected]};
+ r.push(record);
+ r.sort((a,b)=>a.t-b.t);
+ let rank=r.indexOf(record)+1;
+ localStorage.setItem('kunugiyaNT',JSON.stringify(r.slice(0,10)));
+
+ const first=[
+  'やったー！1位だよ！ ねぇねぇ、もう1回やってみよ！',
+  'よっしゃあ！！1位だ！ たいしたもんだぜ！',
+  'やったーー！！1位だよ！ いちばんだー！！🎉',
+  '聞いて聞いてー！1位だって！ みんなに教えなきゃ！',
+  'わぁ〜！1位だよ♪ すっごくがんばったね！',
+  'わぁ〜……1位だって〜♪ すごいねぇ〜',
+  'ほっほっ、1位じゃ！ おみごと、おみごと！',
+  'ワオ！！1位デス！ ニッポンイチですね〜！✨'
+ ];
+ const top10=[
+  `やったー！今回は ${rank}位 だよ！`,
+  `よっしゃあ！${rank}位だ！ やるじゃねぇか！`,
+  `やったー！！${rank}位だよ！ すごーい！`,
+  `聞いて聞いて！なんと ${rank}位 だって！`,
+  `すごいね♪ ${rank}位 に入ったよ！`,
+  `わぁ〜、${rank}位だって〜。すごいね〜`,
+  `ほっほっ、${rank}位じゃ。よくやったのぉ`,
+  `ワオ！${rank}位！ これがニッポンのランキングですね！`
+ ];
+ const outside=[
+  '今回はランキング外！ もう1回やってみよー！',
+  'ランキング外かぁ！ 次はいけるって！',
+  'ランキング外！ つぎはもっとがんばろー！',
+  '今回はランキング外だって！ 次こそね！',
+  'ランキング外だったよ。でも、もう1回いこ♪',
+  'ランキング外だって〜。またのんびりいこ〜',
+  '今回はランキング外じゃ。また挑戦じゃな',
+  'ランキング外！？ ニッポンのランキング、むずかしいデス！'
+ ];
+
+ let speech=$('rankSpeech');
+ speech.className='rankSpeech charSpeech'+selected+(rank===1?' firstPlace':'');
+ speech.textContent=rank===1?first[selected]:(rank<=10?top10[selected]:outside[selected]);
+ $('result').style.display='block';
+}
+function rankings(){let r=JSON.parse(localStorage.getItem('kunugiyaNT')||'[]');$('rankList').innerHTML=r.length?r.map((x,i)=>`<div class="rankrow"><span>${i+1}位</span><span>${Number(x.t).toFixed(2)}秒</span><span>${x.n}</span></div>`).join(''):'<div class="empty">まだ記録はありません</div>';show('ranking')}
+$('start').onclick=play;$('rankBtn').onclick=rankings;$('rankHome').onclick=()=>{show('home')};$('retry').onclick=()=>{restart();countdownThenStart()};$('again').onclick=()=>{restart();countdownThenStart()};$('gameHome').onclick=()=>{running=false;cancelAnimationFrame(raf);show('home');playSceneMusic('home')};$('resultHome').onclick=()=>{running=false;cancelAnimationFrame(raf);show('home');playSceneMusic('home')};board();
+</script><script>window.clearCharacterImages=["assets/character_01.png","assets/character_02.png","assets/character_03.png","assets/character_04.png","assets/character_05.png","assets/character_06.png","assets/character_07.png","assets/character_08.png"];
+document.addEventListener('DOMContentLoaded',()=>{
+  const img=document.getElementById('clearCharacter');
+  const sync=()=>{ if(img && typeof selected!=='undefined' && selected>=0){img.src=window.clearCharacterImages[selected];img.classList.toggle('fitWholeBody',selected===5||selected===7);img.classList.toggle('clearLarge',selected===0||selected===1);img.classList.toggle('sizeMatch',selected===4||selected===6);document.getElementById('clearCharacterWrap').classList.toggle('sizeMatchWrap',selected===4||selected===6);} };
+  const obs=new MutationObserver(()=>{ const r=document.getElementById('result'); if(r && getComputedStyle(r).display!=='none') sync(); });
+  obs.observe(document.body,{attributes:true,subtree:true,attributeFilter:['style','class']});
+  document.getElementById('again')?.addEventListener('click',sync);
+});
+</script>
+
+<script>
+(function(){
+  const musicIds=['audioHome','audioGame','audioClear'];
+  const allIds=[...musicIds,'audioCountdown','audioCorrect','audioWrong','audioTimeup'];
+  let soundOn = localStorage.getItem('kunugiyaSound') !== 'off';
+
+  function el(id){ return document.getElementById(id); }
+  function stop(id,reset=true){
+    const a=el(id); if(!a)return;
+    a.pause(); if(reset){try{a.currentTime=0}catch(e){}}
+  }
+  window.stopAllAudio=function(){
+    allIds.forEach(id=>stop(id));
+  };
+  window.playSfx=function(id){
+    if(!soundOn)return;
+    const a=el(id); if(!a)return;
+    // Each tap gets its own audio instance so rapid correct taps can overlap
+    // instead of restarting/cutting off the previous sound.
+    const sfx = new Audio(a.currentSrc || a.src);
+    sfx.volume = a.volume;
+    sfx.play().catch(()=>{});
+  };
+  window.playSceneMusic=function(scene){
+    musicIds.forEach(id=>stop(id));
+    if(!soundOn)return;
+    const map={home:'audioHome',game:'audioGame',clear:'audioClear'};
+    const a=el(map[scene]); if(!a)return;
+    a.volume = scene==='home' ? .48 : scene==='game' ? .52 : .50;
+    a.play().catch(()=>{});
+  };
+  function updateButton(){
+    const b=el('soundToggle'); if(b)b.textContent=soundOn?'🔊 サウンド ON':'🔇 サウンド OFF';
+  }
+  const toggle=el('soundToggle');
+  if(toggle) toggle.addEventListener('click',function(e){
+    e.stopPropagation();
+    soundOn=!soundOn;
+    localStorage.setItem('kunugiyaSound',soundOn?'on':'off');
+    updateButton();
+    if(!soundOn) stopAllAudio();
+    else playSceneMusic(document.getElementById('game')?.classList.contains('active')?'game':'home');
+  });
+  updateButton();
+
+  // Browsers require one user interaction before audio can begin.
+  const unlock=function(){
+    if(soundOn && document.getElementById('home')?.classList.contains('active')) playSceneMusic('home');
+    document.removeEventListener('pointerdown',unlock);
+    document.removeEventListener('keydown',unlock);
+  };
+  document.addEventListener('pointerdown',unlock);
+  document.addEventListener('keydown',unlock);
+})();
+</script>
+
+<script>
+(function(){
+ const startBtn=document.getElementById('start');
+ const retryBtn=document.getElementById('retry');
+ const overlay=document.getElementById('countdownOverlay');
+ const txt=document.getElementById('countdownText');
+ if(!overlay||!txt) return;
+
+ window.countdownThenStart=function(){
+   running=false;
+   if(window.stopAllAudio) window.stopAllAudio();
+   cancelAnimationFrame(raf);
+   $('time').textContent='0.00';
+   overlay.classList.add('show');
+   const seq=['3','2','1','スタート！'];
+   let i=0;
+   function step(){
+     txt.textContent=seq[i];
+     txt.classList.toggle('startWord',i===3);
+     txt.style.animation='none'; void txt.offsetWidth;
+     txt.style.animation='countPop .7s ease both';
+     if(i<3){ i++; setTimeout(step,1000); }
+     else{
+       setTimeout(()=>{
+         overlay.classList.remove('show');
+         txt.classList.remove('startWord');
+         startAt=performance.now();
+         if(window.playSceneMusic) window.playSceneMusic('game');
+         running=true;
+         $('time').textContent='0.00';
+         raf=requestAnimationFrame(tick);
+       },700);
+     }
+   }
+   // iPhoneで効果音がわずかに遅れて聞こえる分だけ、音を100ms先行させる。
+   // 表示テンポ（3・2・1・スタート！の1秒間隔）はそのまま。
+   if(window.playSfx) window.playSfx('audioCountdown');
+   setTimeout(step,100);
+ }
+ if(startBtn) startBtn.addEventListener('click',()=>{
+   // キャラクター未選択ならホームのまま。BGMもホームBGMを継続する。
+   if(selected===null) return;
+   setTimeout(countdownThenStart,0);
+ });
+ 
+})();
+</script>
+
+<style id="iphone-fix-20260926-2335">
+@media (orientation:portrait){
+  /* 左上：ゲーム紹介へを表示して、文字部分そのものをタップ可能にする */
+  #game::after{display:none!important;}
+  #introBackInGame{
+    display:block!important;position:absolute!important;z-index:80!important;
+    left:2.2%!important;top:1.3%!important;width:25.8%!important;height:5.1%!important;
+    margin:0!important;padding:0!important;border:0!important;border-radius:999px!important;
+    background:rgba(255,255,255,.98)!important;color:#08794a!important;
+    font-family:"M PLUS Rounded 1c","Yu Gothic","Meiryo",sans-serif!important;
+    font-size:clamp(10px,3.0vw,18px)!important;font-weight:900!important;
+    line-height:1!important;cursor:pointer!important;pointer-events:auto!important;
+    touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important;
+  }
+
+  /* 次○・ストップウォッチ：看板の下、ナンバーより上へ */
+  #game .hud{
+    left:25%!important;top:15.9%!important;width:50%!important;height:3.7%!important;
+    gap:2%!important;transform:none!important;z-index:60!important;
+  }
+  #game .hud .pill{
+    height:100%!important;padding:0 1%!important;
+    font-size:clamp(11px,3.35vw,18px)!important;
+    border-radius:1.5vw!important;line-height:1!important;
+  }
+  #game .hud .pill:first-child{width:34%!important;flex:0 0 34%!important;}
+  #game .hud .pill:last-child{width:64%!important;flex:0 0 64%!important;}
+  #game .pill b,#game #next,#game #time{font-size:inherit!important;}
+}
+@media (orientation:landscape){#introBackInGame{display:none!important;}}
+</style>
+<script id="intro-back-click-fix">
+(function(){
+  const b=document.getElementById('introBackInGame');
+  if(!b)return;
+  b.addEventListener('click',function(e){
+    e.preventDefault();e.stopPropagation();
+    try{
+      if(window.parent && window.parent!==window && typeof window.parent.backGamePage==='function'){
+        window.parent.backGamePage(); return;
+      }
+    }catch(err){}
+    if(document.referrer){history.back();}
+  });
+})();
+</script>
+</body></html>
+<style>
+#chosen { display:none !important; }
+</style>
+
+<style>
+#result #msg, #msg { display:none !important; }
+</style>
+<style id="iphone-user-fixes-20260926">
+@media (orientation:portrait){
+  /* XREA広告ぶんを差し引いて、iPhone画面内に下まで収める */
+  .screen{
+    height:calc(100dvh - 105px)!important;
+    width:min(100vw,calc((100dvh - 105px) * .666667))!important;
+  }
+
+  /* ホーム：実際に切り替わるサウンド文字と選択キャラ名を表示 */
+  #soundToggle{
+    opacity:1!important;background:transparent!important;border:0!important;box-shadow:none!important;
+    color:#4d3140!important;font-size:clamp(11px,3.1vw,18px)!important;
+    text-shadow:none!important;z-index:30!important;
+  }
+  #home #pick{
+    display:block!important;position:absolute!important;left:18%!important;top:87.2%!important;width:64%!important;height:auto!important;
+    text-align:center!important;color:#174b36!important;font-weight:900!important;font-size:clamp(12px,3.4vw,19px)!important;
+    line-height:1.15!important;z-index:31!important;pointer-events:none!important;
+    background:rgba(255,255,255,.86)!important;border-radius:999px!important;padding:3px 8px!important;
+  }
+
+  /* ゲーム：ナンバーの後ろのクリーム板を消して背景画像だけにする */
+  #game .grid{
+    background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;
+    top:25.0%!important;
+  }
+  /* 次・ストップウォッチを看板とナンバーの間へ */
+  #game .hud{
+    left:24%!important;top:18.0%!important;width:52%!important;height:5.2%!important;
+  }
+  #game .pill{font-size:clamp(17px,5.2vw,30px)!important;white-space:nowrap!important}
+
+  /* クリア時：上のHUDを消す */
+  #game:has(#result[style*="display: block"]) .hud,
+  #game:has(#result[style*="display:block"]) .hud{display:none!important}
+
+  /* クリア画面：下の「もう一度」「ホームへ」まで画面内に入れる */
+  #result{
+    left:10%!important;right:10%!important;top:27%!important;bottom:3.5%!important;
+    padding:10px 10px 8px!important;font-size:16px!important;overflow:hidden!important;
+    display:none;
+  }
+  #result strong{font-size:clamp(32px,9vw,44px)!important}
+  #clearCharacterWrap{height:90px!important;margin:3px auto!important}
+  #clearCharacter{max-height:88px!important}
+  #rankSpeech{font-size:clamp(13px,3.7vw,18px)!important;line-height:1.35!important;margin:5px auto!important;padding:8px!important}
+  #result .ctrl{font-size:clamp(12px,3.4vw,17px)!important;padding:8px 12px!important;margin:3px!important}
+  #game:has(#result[style*="display: block"]) #gameControls,
+  #game:has(#result[style*="display:block"]) #gameControls{display:none!important}
+}
+</style>
+<script id="iphone-name-label-fix">
+(function(){
+  const pick=document.getElementById('pick');
+  document.querySelectorAll('#home .hot').forEach((b,i)=>{
+    b.addEventListener('click',()=>{
+      if(pick) pick.textContent='選択中：'+(b.dataset.name||'');
+    });
+  });
+})();
+</script>
+
+<style id="iphone-fix-20260926-2306">
+@media (orientation:portrait){
+  /* サウンド：背景画像に印刷されたOFF文字を隠し、実際の状態を表示 */
+  #home #soundToggle{
+    opacity:1!important;
+    background:linear-gradient(145deg,#fff7d2,#ffe5ef)!important;
+    border:2px solid #fff!important;
+    box-shadow:0 2px 5px rgba(0,0,0,.16)!important;
+    color:#4d3140!important;
+    font-size:clamp(10px,2.9vw,16px)!important;
+    line-height:1!important;
+    z-index:40!important;
+  }
+
+  /* 次・ストップウォッチ：看板とナンバー枠の間に収める */
+  #game .hud{
+    left:22%!important;
+    top:19.0%!important;
+    width:56%!important;
+    height:4.4%!important;
+    gap:2%!important;
+  }
+  #game .hud .pill{
+    height:100%!important;
+    padding:0 1.5%!important;
+    font-size:clamp(14px,4.25vw,23px)!important;
+    border-radius:2vw!important;
+  }
+  #game .hud .pill:first-child{width:35%!important;flex:0 0 35%!important}
+  #game .hud .pill:last-child{width:63%!important;flex:0 0 63%!important}
+}
+</style>
+
+<style id="iphone-hud-final-fix-20260926-2345">
+@media (orientation:portrait){
+  /* 最終指定：既存の後勝ちCSSよりさらに後ろで固定 */
+  #game .hud{
+    position:absolute!important;
+    left:25%!important;
+    top:15.2%!important;
+    width:50%!important;
+    height:3.6%!important;
+    gap:2%!important;
+    transform:none!important;
+    z-index:100!important;
+  }
+  #game .hud .pill{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    height:100%!important;
+    padding:0 1%!important;
+    margin:0!important;
+    background:#fff4b8!important;
+    border:0!important;
+    border-radius:1.5vw!important;
+    box-shadow:0 2px 5px #0002!important;
+    font-size:clamp(10px,3.2vw,17px)!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+  }
+  #game .hud .pill:first-child{width:34%!important;flex:0 0 34%!important}
+  #game .hud .pill:last-child{width:64%!important;flex:0 0 64%!important}
+  #game .pill b,#game #next,#game #time{
+    font-size:inherit!important;
+    line-height:1!important;
+  }
+}
+</style>
+
+
+<style id="iphone-independent-status-final">
+#iphoneStatus{display:none}
+@media (orientation:portrait){
+  #game .top .hud{display:none!important}
+  #iphoneStatus{
+    display:flex!important;
+    position:absolute!important;
+    left:13%!important;
+    top:16.5%!important;
+    width:74%!important;
+    height:7.0%!important;
+    z-index:200!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:5%!important;
+    pointer-events:none!important;
+    color:#111!important;
+    font-family:"M PLUS Rounded 1c","Yu Gothic","Meiryo",sans-serif!important;
+    font-size:clamp(25px,8.0vw,42px)!important;
+    font-weight:900!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+  }
+  #iphoneStatus span{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    background:#fff4b8!important;
+    border-radius:1.5vw!important;
+    box-shadow:0 2px 5px #0002!important;
+    height:100%!important;
+    padding:0 3%!important;
+  }
+  #iphoneStatus b{font:inherit!important}
+}
+</style>
+<script id="iphone-independent-status-sync">
+(function(){
+  const next=document.getElementById('next');
+  const time=document.getElementById('time');
+  const iNext=document.getElementById('iphoneNext');
+  const iTime=document.getElementById('iphoneTime');
+  if(!next||!time||!iNext||!iTime)return;
+  const sync=()=>{iNext.textContent=next.textContent;iTime.textContent=time.textContent};
+  new MutationObserver(sync).observe(next,{childList:true,subtree:true,characterData:true});
+  new MutationObserver(sync).observe(time,{childList:true,subtree:true,characterData:true});
+  sync();
+})();
+</script>
+
+
+<style id="iphone-tune3-final">
+@media (orientation:portrait){
+  #game .bottom{
+    bottom:2.0%!important;
+  }
+}
+</style>
+
+
+<style id="iphone-hide-bottom-buttons-final">
+@media (orientation:portrait){
+  #game .bottom{
+    display:none!important;
+  }
+}
+</style>
+<style id="home-touch-character-update-20260927">
+@media (orientation:portrait){
+  /* ゲームスタート画面：この画像上の8人を直接タッチ */
+  #home .hot{position:absolute!important;height:auto!important;border:0!important;background:transparent!important;border-radius:28%!important;box-sizing:border-box!important;z-index:12!important;pointer-events:auto!important;}
+  #home .hot:nth-of-type(1){left:7%!important;top:45%!important;width:25%!important;height:15%!important}   /* きゃべっち */
+  #home .hot:nth-of-type(2){left:29%!important;top:44%!important;width:21%!important;height:16%!important}  /* パンナ */
+  #home .hot:nth-of-type(3){left:48%!important;top:44%!important;width:21%!important;height:16%!important}  /* あじへい */
+  #home .hot:nth-of-type(4){left:68%!important;top:43%!important;width:23%!important;height:18%!important}  /* ういんた */
+  #home .hot:nth-of-type(5){left:5%!important;top:58%!important;width:27%!important;height:16%!important}   /* コロミさん */
+  #home .hot:nth-of-type(6){left:31%!important;top:58%!important;width:21%!important;height:16%!important}  /* たまちゃん */
+  #home .hot:nth-of-type(7){left:51%!important;top:58%!important;width:24%!important;height:17%!important}  /* せんべえ */
+  #home .hot:nth-of-type(8){left:75%!important;top:58%!important;width:22%!important;height:17%!important}  /* アイミー */
+  #home .hot.sel{outline:4px solid #fff!important;box-shadow:0 0 0 5px #ffd84d,0 0 22px 10px rgba(255,230,80,.9)!important;background:rgba(255,255,255,.08)!important;}
+  #home .hot.sel::after{display:none!important}
+
+  /* 下の選択中表示は使わない */
+  #home #pick{display:none!important}
+
+  /* 画像下部の空きスペースに実ボタンを表示 */
+  #home #start,#home #rankBtn{opacity:1!important;z-index:20!important;color:#fff!important;font-weight:900!important;border:3px solid rgba(255,255,255,.95)!important;box-shadow:0 5px 12px rgba(0,0,0,.25)!important;}
+  #home #start{left:16%!important;top:78.5%!important;width:68%!important;height:6.2%!important;background:linear-gradient(180deg,#ff7f50,#f04b63)!important;border-radius:999px!important;font-size:clamp(16px,4.6vw,24px)!important;}
+  #home #rankBtn{left:24%!important;top:86%!important;width:52%!important;height:5.5%!important;background:linear-gradient(180deg,#39b979,#168a58)!important;border-radius:999px!important;font-size:clamp(14px,4vw,21px)!important;}
+  /* サウンドは既存仕様のまま。ランキングと重ならない位置だけ確保 */
+  #home #soundToggle{top:92.5%!important;left:30%!important;width:40%!important;height:4.5%!important;z-index:20!important;}
+}
+</style>
+<script id="home-touch-character-no-label-20260927">
+(function(){
+  const pick=document.getElementById('pick');
+  document.querySelectorAll('#home .hot').forEach(function(b){
+    b.addEventListener('click',function(){
+      if(pick) pick.textContent='';
+    });
+  });
+})();
+</script>
+
+<style id="requested-three-fixes-20260927">
+@media (orientation:portrait){
+  /* 1. 5×5を左右とも切れず、25マスすべて画面内に収める */
+  #game .grid{
+    box-sizing:border-box!important;
+    left:5%!important;
+    right:auto!important;
+    top:23.5%!important;
+    width:90%!important;
+    padding:0!important;
+    gap:1vw!important;
+    transform:none!important;
+    overflow:visible!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+  }
+  #game .num{
+    box-sizing:border-box!important;
+    min-width:0!important;
+    width:100%!important;
+    aspect-ratio:1/1!important;
+    font-size:clamp(25px,7.5vw,43px)!important;
+  }
+
+  /* 2. 5×5の下に「もう一度」「ホームへ」を表示 */
+  #game #gameControls{
+    display:flex!important;
+    position:absolute!important;
+    left:15%!important;
+    top:82.5%!important;
+    bottom:auto!important;
+    width:70%!important;
+    height:5.4%!important;
+    gap:4%!important;
+    padding:0!important;
+    margin:0!important;
+    transform:none!important;
+    background:transparent!important;
+    border:0!important;
+    z-index:210!important;
+  }
+  #game #gameControls .ctrl{
+    display:block!important;
+    flex:1 1 0!important;
+    height:100%!important;
+    opacity:1!important;
+    visibility:visible!important;
+    margin:0!important;
+    padding:0 2%!important;
+    border:3px solid #fff!important;
+    border-radius:999px!important;
+    color:#fff!important;
+    font-size:clamp(12px,3.7vw,19px)!important;
+    font-weight:900!important;
+    line-height:1!important;
+    box-shadow:0 3px 8px rgba(0,0,0,.25)!important;
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+  }
+  #game #retry{background:linear-gradient(180deg,#42bf7a,#138a56)!important;}
+  #game #gameHome{background:linear-gradient(180deg,#ff9c45,#ef6b34)!important;}
+
+  /* 3. 次○とタイマーを小さくして、看板と数字マスの間へ */
+  #game #iphoneStatus{
+    display:flex!important;
+    left:22%!important;
+    top:17.4%!important;
+    width:56%!important;
+    height:4.2%!important;
+    gap:3%!important;
+    font-size:clamp(13px,4.0vw,21px)!important;
+  }
+  #game #iphoneStatus span{
+    height:100%!important;
+    padding:0 3%!important;
+    border-radius:1.5vw!important;
+  }
+}
+</style>
+
+<style id="requested-four-position-fixes-20260927">
+@media (orientation:portrait){
+  /* 1. 5×5は現状維持：grid / num には変更を加えない */
+
+  /* 2・3. 次○は看板の左、タイマーは看板の右。中央看板には被せない */
+  #game #iphoneStatus{
+    display:block!important;
+    left:0!important;
+    top:8.8%!important;
+    width:100%!important;
+    height:7%!important;
+    font-size:clamp(16px,5vw,27px)!important;
+    pointer-events:none!important;
+  }
+  #game #iphoneStatus span{
+    position:absolute!important;
+    top:0!important;
+    width:24%!important;
+    height:100%!important;
+    box-sizing:border-box!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    padding:0 1%!important;
+    border-radius:2vw!important;
+    white-space:nowrap!important;
+  }
+  #game #iphoneStatus span:first-child{left:2%!important;right:auto!important;}
+  #game #iphoneStatus span:last-child{left:auto!important;right:2%!important;}
+
+  /* 4. もう一度・ホームへを下へ。5×5には被せない */
+  #game #gameControls{
+    top:87%!important;
+  }
+}
+</style>
+
+<style id="hide-visible-iphone-status-only-20260927">
+/* iPhone画面上の「次○」「タイマー」の表示だけを非表示。処理・他要素は変更しない */
+@media (orientation:portrait){
+  #game #iphoneStatus,
+  #game #iphoneNext,
+  #game #iphoneTime{
+    display:none!important;
+  }
+}
+</style>
+
+<style id="restore-iphone-timer-only-square-20260927">
+/* タイマー表示だけを復活。次○・5×5・背景・操作ボタン等は変更しない */
+@media (orientation:portrait){
+  #game #iphoneStatus{
+    display:block!important;
+    position:absolute!important;
+    left:0!important;
+    top:8.8%!important;
+    width:100%!important;
+    height:7%!important;
+    pointer-events:none!important;
+    z-index:200!important;
+  }
+  #game #iphoneStatus > span:first-child,
+  #game #iphoneNext{
+    display:none!important;
+  }
+  #game #iphoneStatus > span:last-child{
+    display:flex!important;
+    position:absolute!important;
+    top:0!important;
+    right:2%!important;
+    left:auto!important;
+    width:19%!important;
+    height:auto!important;
+    aspect-ratio:1 / 1!important;
+    box-sizing:border-box!important;
+    padding:5%!important;
+    border:3px solid #fff!important;
+    border-radius:4vw!important;
+    background:linear-gradient(145deg,#fff8b8,#ffd86a)!important;
+    box-shadow:0 4px 0 rgba(220,143,28,.55),0 5px 10px rgba(0,0,0,.22)!important;
+    align-items:center!important;
+    justify-content:center!important;
+    white-space:nowrap!important;
+  }
+  #game #iphoneStatus .iphoneTimerIcon{
+    display:none!important;
+  }
+  #game #iphoneStatus .iphoneTimerValue{
+    display:flex!important;
+    position:static!important;
+    width:100%!important;
+    height:auto!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:none!important;
+    box-shadow:none!important;
+    align-items:center!important;
+    justify-content:center!important;
+    color:#111!important;
+    font-size:clamp(15px,4.7vw,25px)!important;
+    font-weight:900!important;
+    line-height:1!important;
+  }
+  #game #iphoneTime{
+    display:inline!important;
+    font:inherit!important;
+  }
+}
+</style>
+
+<style id="requested-two-changes-only">
+#introBackInGame{display:none!important;pointer-events:none!important;}
+</style>
+
+<style id="selected-character-behind-grid-only-20260927">
+/* 選択したキャラクターを5×5の裏側に大きく表示。その他のレイアウトは変更しない。 */
+@media (orientation:portrait){
+  #game .grid::before{
+    display:block!important;
+    content:""!important;
+    position:absolute!important;
+    inset:4%!important;
+    z-index:0!important;
+    pointer-events:none!important;
+    background-image:var(--grid-character)!important;
+    background-size:contain!important;
+    background-repeat:no-repeat!important;
+    background-position:center!important;
+  }
+  #game .grid .num{position:relative!important;z-index:2!important;}
+  #game .grid .num.done,
+  #game .grid .num.revealed{
+    opacity:0!important;
+    visibility:hidden!important;
+    pointer-events:none!important;
+  }
+}
+</style>
