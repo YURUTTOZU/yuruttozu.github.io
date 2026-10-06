@@ -59,74 +59,36 @@ button,.hit,.characterHotspot,.gamePlayHotspot{-webkit-tap-highlight-color:trans
 </style>
 
 
-<style id="social-links-style">
-#socialLinks{
-  width:min(100%,1024px);
-  margin:0 auto;
-  padding:26px 18px 34px;
-  background:linear-gradient(180deg,#09245c 0%,#061a43 100%);
-  color:#fff;
-  font-family:"Hiragino Maru Gothic ProN","Yu Gothic",Meiryo,sans-serif;
-  text-align:center;
-}
-#socialLinks h2{
-  margin:0 0 8px;
-  font-size:clamp(22px,4.5vw,34px);
-  line-height:1.25;
-}
-#socialLinks p{
-  margin:0 0 20px;
-  font-size:clamp(13px,2.8vw,17px);
-  line-height:1.6;
-  font-weight:700;
-}
-.socialGrid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:12px;
-  max-width:760px;
-  margin:0 auto;
-}
-.socialBtn{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:58px;
-  padding:12px 14px;
-  border-radius:18px;
-  text-decoration:none;
-  color:#fff;
-  font-size:clamp(15px,3.5vw,20px);
-  line-height:1.2;
-  font-weight:900;
-  box-shadow:0 5px 14px #0004;
-  border:2px solid #ffffff55;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:manipulation;
-}
-.socialBtn:active{transform:translateY(1px)}
-.socialBtn.instagram{background:linear-gradient(135deg,#7b2cff,#e1306c,#ff9b38)}
-.socialBtn.tiktok{background:#111}
-.socialBtn.youtube{background:#e62117}
-.socialBtn.line{background:#06c755}
-@media(max-width:520px){
-  #socialLinks{padding:22px 14px 28px}
-  .socialGrid{grid-template-columns:1fr}
-  .socialBtn{min-height:54px}
-}
+<style id="official-link-hotspots">
+/* ホーム画像に元から描かれているSNSアイコンをタップ可能にする */
+.socialHotspot{position:absolute;display:block;z-index:8;background:transparent;border:0;border-radius:14px;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+
+/* 右上のInstagram / TikTok / YouTube */
+.social-top-instagram{left:81.0%;top:1.35%;width:5.4%;height:3.4%}
+.social-top-tiktok{left:86.4%;top:1.35%;width:5.2%;height:3.4%}
+.social-top-youtube{left:91.6%;top:1.35%;width:6.2%;height:3.4%}
+
+/* 湖の上に描かれているInstagram / TikTok / YouTube */
+.social-lake-instagram{left:37.1%;top:76.0%;width:8.0%;height:5.4%}
+.social-lake-tiktok{left:48.2%;top:76.0%;width:7.4%;height:5.4%}
+.social-lake-youtube{left:59.3%;top:76.0%;width:8.0%;height:5.4%}
+
+/* LINEスタンプ紹介ページの「LINEスタンプを見る！」 */
+.lineShopHotspot{position:absolute;left:25.0%;top:87.2%;width:50.0%;height:7.7%;z-index:12;display:block;background:transparent;border:0;border-radius:999px;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 </style>
 
-</head><body><div id="home"><img src="assets/home.png" alt="ゆるっとーず公式ホーム画面"><button class="hit game-top" onclick="showGamePage()" aria-label="ゲーム"></button><button class="hit game-card" onclick="showGamePage()" aria-label="ゲームを見る"></button><button class="hit char-top-hit" aria-label="キャラクター" onclick="showCharacters()"></button><button class="hit char-card-hit" aria-label="キャラクターを見る" onclick="showCharacters()"></button><button class="hit line-top-hit" aria-label="LINEスタンプ" onclick="showLinePage()"></button><button class="hit line-card-hit" aria-label="LINEスタンプを見る" onclick="showLinePage()"></button><button class="hit page-top-hit" aria-label="ページトップへ" onclick="window.scrollTo({top:0,behavior:'smooth'})"></button></div>
-<section id="socialLinks" aria-label="ゆるっとーず公式リンク">
-  <h2>ゆるっとーず公式リンク</h2>
-  <p>SNSやLINEスタンプもチェックしてね！</p>
-  <div class="socialGrid">
-    <a class="socialBtn instagram" href="https://www.instagram.com/yuruttozu" target="_blank" rel="noopener noreferrer">Instagram</a>
-    <a class="socialBtn tiktok" href="https://www.tiktok.com/@yuruttozu" target="_blank" rel="noopener noreferrer">TikTok</a>
-    <a class="socialBtn youtube" href="https://youtube.com/@yuruttozu" target="_blank" rel="noopener noreferrer">YouTube</a>
-    <a class="socialBtn line" href="https://line.me/S/shop/sticker/author/784089/new?lang=ja&utm_source=gnsh_staut" target="_blank" rel="noopener noreferrer">LINEスタンプ</a>
-  </div>
-</section>
-<section id="aboutPage"><div class="aboutPageWrap"><img class="aboutPageImage" src="assets/about.png" alt="ゆるっとーずって？紹介ページ"><button class="aboutPageHomeBtn" onclick="showHome()">← ホームにもどる</button></div></section><section id="charactersPage"><div class="characterListWrap"><img class="characterListImage" src="assets/characters.png" alt="ゆるっとーず キャラクター紹介"><button class="listHomeBtn" onclick="showHome()">← ホームにもどる</button><button class="characterHotspot c1" onclick="openProfile(0)" aria-label="きゃべっち"></button><button class="characterHotspot c2" onclick="openProfile(1)" aria-label="あじへい"></button><button class="characterHotspot c3" onclick="openProfile(2)" aria-label="ういんた"></button><button class="characterHotspot c4" onclick="openProfile(3)" aria-label="コロミさん"></button><button class="characterHotspot c5" onclick="openProfile(4)" aria-label="パンナ"></button><button class="characterHotspot c6" onclick="openProfile(5)" aria-label="たまちゃん"></button><button class="characterHotspot c7" onclick="openProfile(6)" aria-label="せんべえ"></button><button class="characterHotspot c8" onclick="openProfile(7)" aria-label="アイミー"></button></div></section><section id="profilePage"><button class="profileBackBtn" onclick="closeProfile()">← 8人の一覧にもどる</button><div class="profileViewport"><img class="profileImage" id="profile0" src="assets/profile_kyabecchi.jpg" alt="きゃべっちのプロフィール"><img class="profileImage" id="profile1" src="assets/profile_ajihei.jpg" alt="あじへいのプロフィール"><img class="profileImage" id="profile2" src="assets/profile_uinta.jpg" alt="ういんたのプロフィール"><img class="profileImage" id="profile3" src="assets/profile_koromi.jpg" alt="コロミさんのプロフィール"><img class="profileImage" id="profile4" src="assets/profile_panna.jpg" alt="パンナのプロフィール"><img class="profileImage" id="profile5" src="assets/profile_tamachan.jpg" alt="たまちゃんのプロフィール"><img class="profileImage" id="profile6" src="assets/profile_senbee.jpg" alt="せんべえのプロフィール"><img class="profileImage" id="profile7" src="assets/profile_aimii.jpg" alt="アイミーのプロフィール"></div></section><section id="gamePage"><div class="gamePageWrap"><img class="gamePageImage" src="assets/games.png" alt="ゆるっとーずのゲーム紹介"><button class="gamePageHomeBtn" onclick="showHome()">← ホームへ</button><button class="gamePlayHotspot numberTouchHotspot" onclick="play()" aria-label="ゆるっとーずのナンバータッチで遊ぶ"></button><button class="gamePlayHotspot cartDashHotspot" onclick="playCartDash()" aria-label="ゆるっとーずのカートダッシュで遊ぶ"></button></div></section><section id="linePage"><div class="linePageWrap"><img class="linePageImage" src="assets/line_stamps.png" alt="ゆるっとーず LINEスタンプ紹介"><button class="linePageHomeBtn" onclick="showHome()">← ホームへ</button></div></section><div id="gamewrap"><button id="back" onclick="backGamePage()">← ゲーム紹介へ</button><iframe id="gameframe" title="ゆるっとーずのナンバータッチ"></iframe></div><script>
-const GAME_URL='game/game.html';const CART_DASH_URL='cartdash/cart_dash_game/';let loaded=false;function showAboutPage(){document.getElementById('home').style.display='none';document.getElementById('socialLinks').style.display='none';document.getElementById('charactersPage').classList.remove('activeCharacters');document.getElementById('linePage').classList.remove('activeLinePage');document.getElementById('gamePage').classList.remove('activeGamePage');document.getElementById('profilePage').style.display='none';document.getElementById('gamewrap').style.display='none';document.getElementById('aboutPage').classList.add('activeAboutPage');window.scrollTo(0,0)}function showCharacters(){document.getElementById('home').style.display='none';document.getElementById('socialLinks').style.display='none';document.getElementById('aboutPage').classList.remove('activeAboutPage');document.getElementById('gamePage').classList.remove('activeGamePage');document.getElementById('linePage').classList.remove('activeLinePage');document.getElementById('gamewrap').style.display='none';document.getElementById('profilePage').style.display='none';document.getElementById('charactersPage').classList.add('activeCharacters');window.scrollTo(0,0)}function showHome(){document.getElementById('aboutPage').classList.remove('activeAboutPage');document.getElementById('charactersPage').classList.remove('activeCharacters');document.getElementById('linePage').classList.remove('activeLinePage');document.getElementById('gamePage').classList.remove('activeGamePage');document.getElementById('profilePage').style.display='none';document.getElementById('gamewrap').style.display='none';document.getElementById('home').style.display='block';document.getElementById('socialLinks').style.display='block';window.scrollTo(0,0)}function showLinePage(){document.getElementById('home').style.display='none';document.getElementById('socialLinks').style.display='none';document.getElementById('aboutPage').classList.remove('activeAboutPage');document.getElementById('charactersPage').classList.remove('activeCharacters');document.getElementById('gamePage').classList.remove('activeGamePage');document.getElementById('profilePage').style.display='none';document.getElementById('gamewrap').style.display='none';document.getElementById('linePage').classList.add('activeLinePage');window.scrollTo(0,0)}function showGamePage(){document.getElementById('home').style.display='none';document.getElementById('socialLinks').style.display='none';document.getElementById('aboutPage').classList.remove('activeAboutPage');document.getElementById('linePage').classList.remove('activeLinePage');document.getElementById('charactersPage').classList.remove('activeCharacters');document.getElementById('profilePage').style.display='none';document.getElementById('gamewrap').style.display='none';document.getElementById('gamePage').classList.add('activeGamePage');window.scrollTo(0,0)}function openProfile(n){document.getElementById('charactersPage').classList.remove('activeCharacters');document.getElementById('profilePage').style.display='block';document.querySelectorAll('.profileImage').forEach((x,i)=>x.classList.toggle('activeProfile',i===n));window.scrollTo(0,0)}function closeProfile(){document.getElementById('profilePage').style.display='none';document.querySelectorAll('.profileImage').forEach(x=>x.classList.remove('activeProfile'));showCharacters()}function play(){document.getElementById('home').style.display='none';document.getElementById('socialLinks').style.display='none';document.getElementById('aboutPage').classList.remove('activeAboutPage');document.getElementById('linePage').classList.remove('activeLinePage');document.getElementById('charactersPage').classList.remove('activeCharacters');document.getElementById('gamePage').classList.remove('activeGamePage');document.getElementById('profilePage').style.display='none';document.getElementById('gamewrap').style.display='block';if(!loaded){document.getElementById('gameframe').src=GAME_URL;loaded=true;}}function playCartDash(){window.location.href=CART_DASH_URL;}function stopNumberTouch(){const f=document.getElementById('gameframe');try{const d=f.contentDocument||f.contentWindow.document;d.querySelectorAll('audio,video').forEach(a=>{a.pause();try{a.currentTime=0}catch(e){}});if(f.contentWindow&&typeof f.contentWindow.stopAllAudio==='function')f.contentWindow.stopAllAudio();}catch(e){}if(f){f.src='about:blank';}loaded=false;}function backHome(){stopNumberTouch();showHome()}function backGamePage(){stopNumberTouch();document.getElementById('gamewrap').style.display='none';showGamePage()}
+</head><body><div id="home"><img src="assets/home.png" alt="ゆるっとーず公式ホーム画面"><button class="hit game-top" onclick="showGamePage()" aria-label="ゲーム"></button><button class="hit game-card" onclick="showGamePage()" aria-label="ゲームを見る"></button><button class="hit char-top-hit" aria-label="キャラクター" onclick="showCharacters()"></button><button class="hit char-card-hit" aria-label="キャラクターを見る" onclick="showCharacters()"></button><button class="hit line-top-hit" aria-label="LINEスタンプ" onclick="showLinePage()"></button><button class="hit line-card-hit" aria-label="LINEスタンプを見る" onclick="showLinePage()"></button><button class="hit page-top-hit" aria-label="ページトップへ" onclick="window.scrollTo({top:0,behavior:'smooth'})"></button>
+<a class="socialHotspot social-top-instagram" href="https://www.instagram.com/yuruttozu" target="_blank" rel="noopener noreferrer" aria-label="Instagramを開く"></a>
+<a class="socialHotspot social-top-tiktok" href="https://www.tiktok.com/@yuruttozu" target="_blank" rel="noopener noreferrer" aria-label="TikTokを開く"></a>
+<a class="socialHotspot social-top-youtube" href="https://youtube.com/@yuruttozu" target="_blank" rel="noopener noreferrer" aria-label="YouTubeを開く"></a>
+<a class="socialHotspot social-lake-instagram" href="https://www.instagram.com/yuruttozu" target="_blank" rel="noopener noreferrer" aria-label="Instagramを開く"></a>
+<a class="socialHotspot social-lake-tiktok" href="https://www.tiktok.com/@yuruttozu" target="_blank" rel="noopener noreferrer" aria-label="TikTokを開く"></a>
+<a class="socialHotspot social-lake-youtube" href="https://youtube.com/@yuruttozu" target="_blank" rel="noopener noreferrer" aria-label="YouTubeを開く"></a>
+</div><section id="aboutPage"><div class="aboutPageWrap"><img class="aboutPageImage" src="assets/about.png" alt="ゆるっとーずって？紹介ページ"><button class="aboutPageHomeBtn" onclick="showHome()">← ホームにもどる</button></div></section><section id="charactersPage"><div class="characterListWrap"><img class="characterListImage" src="assets/characters.png" alt="ゆるっとーず キャラクター紹介"><button class="listHomeBtn" onclick="showHome()">← ホームにもどる</button><button class="characterHotspot c1" onclick="openProfile(0)" aria-label="きゃべっち"></button><button class="characterHotspot c2" onclick="openProfile(1)" aria-label="あじへい"></button><button class="characterHotspot c3" onclick="openProfile(2)" aria-label="ういんた"></button><button class="characterHotspot c4" onclick="openProfile(3)" aria-label="コロミさん"></button><button class="characterHotspot c5" onclick="openProfile(4)" aria-label="パンナ"></button><button class="characterHotspot c6" onclick="openProfile(5)" aria-label="たまちゃん"></button><button class="characterHotspot c7" onclick="openProfile(6)" aria-label="せんべえ"></button><button class="characterHotspot c8" onclick="openProfile(7)" aria-label="アイミー"></button></div></section><section id="profilePage"><button class="profileBackBtn" onclick="closeProfile()">← 8人の一覧にもどる</button><div class="profileViewport"><img class="profileImage" id="profile0" src="assets/profile_kyabecchi.jpg" alt="きゃべっちのプロフィール"><img class="profileImage" id="profile1" src="assets/profile_ajihei.jpg" alt="あじへいのプロフィール"><img class="profileImage" id="profile2" src="assets/profile_uinta.jpg" alt="ういんたのプロフィール"><img class="profileImage" id="profile3" src="assets/profile_koromi.jpg" alt="コロミさんのプロフィール"><img class="profileImage" id="profile4" src="assets/profile_panna.jpg" alt="パンナのプロフィール"><img class="profileImage" id="profile5" src="assets/profile_tamachan.jpg" alt="たまちゃんのプロフィール"><img class="profileImage" id="profile6" src="assets/profile_senbee.jpg" alt="せんべえのプロフィール"><img class="profileImage" id="profile7" src="assets/profile_aimii.jpg" alt="アイミーのプロフィール"></div></section><section id="gamePage"><div class="gamePageWrap"><img class="gamePageImage" src="assets/games.png" alt="ゆるっとーずのゲーム紹介"><button class="gamePageHomeBtn" onclick="showHome()">← ホームへ</button><button class="gamePlayHotspot numberTouchHotspot" onclick="play()" aria-label="ゆるっとーずのナンバータッチで遊ぶ"></button><button class="gamePlayHotspot cartDashHotspot" onclick="playCartDash()" aria-label="ゆるっとーずのカートダッシュで遊ぶ"></button></div></section><section id="linePage"><div class="linePageWrap"><img class="linePageImage" src="assets/line_stamps.png" alt="ゆるっとーず LINEスタンプ紹介"><button class="linePageHomeBtn" onclick="showHome()">← ホームへ</button>
+<a class="lineShopHotspot"
+   href="https://line.me/S/shop/sticker/author/784089/new?lang=ja&utm_source=gnsh_staut"
+   target="_blank" rel="noopener noreferrer"
+   aria-label="LINEスタンプショップを見る"></a>
+</div></section><div id="gamewrap"><button id="back" onclick="backGamePage()">← ゲーム紹介へ</button><iframe id="gameframe" title="ゆるっとーずのナンバータッチ"></iframe></div><script>
+const GAME_URL='game/game.html';const CART_DASH_URL='cartdash/cart_dash_game/';let loaded=false;function showAboutPage(){document.getElementById('home').style.display='none';document.getElementById('charactersPage').classList.remove('activeCharacters');document.getElementById('linePage').classList.remove('activeLinePage');document.getElementById('gamePage').classList.remove('activeGamePage');document.getElementById('profilePage').style.display='none';document.getElementById('gamewrap').style.display='none';document.getElementById('aboutPage').classList.add('activeAboutPage');window.scrollTo(0,0)}function showCharacters(){document.getElementById('home').style.display='none';document.getElementById('aboutPage').classList.remove('activeAboutPage');document.getElementById('gamePage').classList.remove('activeGamePage');document.getElementById('linePage').classList.remove('activeLinePage');document.getElementById('gamewrap').style.display='none';document.getElementById('profilePage').style.display='none';document.getElementById('charactersPage').classList.add('activeCharacters');window.scrollTo(0,0)}function showHome(){document.getElementById('aboutPage').classList.remove('activeAboutPage');document.getElementById('charactersPage').classList.remove('activeCharacters');document.getElementById('linePage').classList.remove('activeLinePage');document.getElementById('gamePage').classList.remove('activeGamePage');document.getElementById('profilePage').style.display='none';document.getElementById('gamewrap').style.display='none';document.getElementById('home').style.display='block';window.scrollTo(0,0)}function showLinePage(){document.getElementById('home').style.display='none';document.getElementById('aboutPage').classList.remove('activeAboutPage');document.getElementById('charactersPage').classList.remove('activeCharacters');document.getElementById('gamePage').classList.remove('activeGamePage');document.getElementById('profilePage').style.display='none';document.getElementById('gamewrap').style.display='none';document.getElementById('linePage').classList.add('activeLinePage');window.scrollTo(0,0)}function showGamePage(){document.getElementById('home').style.display='none';document.getElementById('aboutPage').classList.remove('activeAboutPage');document.getElementById('linePage').classList.remove('activeLinePage');document.getElementById('charactersPage').classList.remove('activeCharacters');document.getElementById('profilePage').style.display='none';document.getElementById('gamewrap').style.display='none';document.getElementById('gamePage').classList.add('activeGamePage');window.scrollTo(0,0)}function openProfile(n){document.getElementById('charactersPage').classList.remove('activeCharacters');document.getElementById('profilePage').style.display='block';document.querySelectorAll('.profileImage').forEach((x,i)=>x.classList.toggle('activeProfile',i===n));window.scrollTo(0,0)}function closeProfile(){document.getElementById('profilePage').style.display='none';document.querySelectorAll('.profileImage').forEach(x=>x.classList.remove('activeProfile'));showCharacters()}function play(){document.getElementById('home').style.display='none';document.getElementById('aboutPage').classList.remove('activeAboutPage');document.getElementById('linePage').classList.remove('activeLinePage');document.getElementById('charactersPage').classList.remove('activeCharacters');document.getElementById('gamePage').classList.remove('activeGamePage');document.getElementById('profilePage').style.display='none';document.getElementById('gamewrap').style.display='block';if(!loaded){document.getElementById('gameframe').src=GAME_URL;loaded=true;}}function playCartDash(){window.location.href=CART_DASH_URL;}function stopNumberTouch(){const f=document.getElementById('gameframe');try{const d=f.contentDocument||f.contentWindow.document;d.querySelectorAll('audio,video').forEach(a=>{a.pause();try{a.currentTime=0}catch(e){}});if(f.contentWindow&&typeof f.contentWindow.stopAllAudio==='function')f.contentWindow.stopAllAudio();}catch(e){}if(f){f.src='about:blank';}loaded=false;}function backHome(){stopNumberTouch();showHome()}function backGamePage(){stopNumberTouch();document.getElementById('gamewrap').style.display='none';showGamePage()}
 </script></body></html>
